@@ -1,3 +1,4 @@
+module Sec2 where
 data Bool : Set where
   T : Bool
   F : Bool
@@ -55,7 +56,7 @@ _>_ : ℕ → ℕ → Bool
 m > n = n < m
 
 -- XXX: == on Nat
-_≡_ : ℕ → ℕ → Bool
+private _≡_ : ℕ → ℕ → Bool
 x ≡ y = (x ≥ y) & (x ≤ y)
 
 _-_ : ℕ → ℕ → ℕ
@@ -89,11 +90,11 @@ test1 = length test
 data So : Bool → Set where
   ok : So T
 
-head : {A : Set} → (x : List A) → So ((length x) ≥ 1) → A
+private head : {A : Set} → (x : List A) → So ((length x) ≥ 1) → A
 head [] ()
 head (x ∷ x₁) _ = x
 
-tail : {A : Set} → (x : List A) → So ((length x) ≥ 1) → List A
+private tail : {A : Set} → (x : List A) → So ((length x) ≥ 1) → List A
 tail [] ()
 tail (x ∷ x₁) _ = x₁
 
@@ -103,18 +104,15 @@ if T then x else _ = x
 if F then _ else y = y
   
 
-filter : {A : Set} → (A → Bool) → List A → List A
+private filter : {A : Set} → (A → Bool) → List A → List A
 filter cmp [] = []
 filter cmp (x ∷ x₁) = if (cmp x) 
                       then x ∷ (filter cmp x₁)
                       else filter cmp x₁
 
-foldl : {A : Set} → (A → A → A) → List A → A → A
+private foldl : {A : Set} → (A → A → A) → List A → A → A
 foldl _ [] y = y
 foldl f (x ∷ x₁) y = foldl f x₁ (f x y)
-
-test2 : ℕ
-test2 = head (2 ∷ []) ok
 
 -- XXX: injective tuple
 data _+′_  (A B : Set) : Set where
@@ -140,15 +138,28 @@ data _Π_ (A B : Set) : Set where
   <_,_> : (x : A) → (y : B) → A Π B
 
 
-zip : {A B : Set} → (xs : List A) → (ys : List B) → So ((length xs) ≡ (length ys)) → List (A Π B)
+private zip : {A B : Set} → (xs : List A) → (ys : List B) → So ((length xs) ≡ (length ys)) → List (A Π B)
 zip [] [] k = []
 zip [] (x ∷ ys) ()
 zip (x ∷ xs) [] ()
 zip (x ∷ xs) (y ∷ ys) k = < x , y > ∷ zip xs ys k
 
 -- TODO: Write unzip later on
-unzip : {A B : Set} → List (A Π B) → (List A Π List B)
-unzip xs = {!!}
+-- unzip : {A B : Set} → List (A Π B) → (List A Π List B)
+-- unzip xs = {!!}
 
 test5 : List (ℕ Π ℕ)
 test5 = zip ((1 ∷ [])) (2 ∷ []) ok
+
+data _==_ {A : Set} (x : A) : A → Set where
+  refl : x == x
+
+plus-z : (y : ℕ) → (y == (y + Z))
+plus-z Z = refl
+plus-z (S y) = {!!}
+
+commute₊ : (x y : ℕ) → ((x + y) == (y + x))
+commute₊ Z Z = refl
+commute₊ Z (S y) = {!!}
+commute₊ (S x) Z = {!!}
+commute₊ (S x) (S y) = {!!}
