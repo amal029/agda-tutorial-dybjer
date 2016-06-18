@@ -151,8 +151,11 @@ zip (x ∷ xs) (y ∷ ys) k = < x , y > ∷ zip xs ys k
 test5 : List (ℕ Π ℕ)
 test5 = zip ((1 ∷ [])) (2 ∷ []) ok
 
-data _≡_ {A : Set} (x : A) : A → Set where
+infix 4 _≡_
+data _≡_ {a} {A : Set a} (x : A) : A → Set a where
   refl : x ≡ x
+{-# BUILTIN EQUALITY _≡_  #-}
+{-# BUILTIN REFL     refl #-}
 
 -- XXX: Transitivity of ℕ
 ℕ-trans : {x y z : ℕ} → (x ≡ y) → (y ≡ z) → (x ≡ z)
@@ -174,11 +177,13 @@ associativity-N : (a b c : ℕ) → ((a + b) + c) ≡ (a + (b + c))
 associativity-N Z y z = refl
 associativity-N (S x) y z = cong (associativity-N x y z)
 
-x+1+y≡y+1+x : (x y : ℕ) → (x + (1 + y)) ≡ (1 + (x + y))
-x+1+y≡y+1+x Z y = refl
-x+1+y≡y+1+x (S x) y = cong (x+1+y≡y+1+x x y)
+t1 : (x y : ℕ) → (x + S y) ≡ S (x + y)
+t1 Z y = refl
+t1 (S x) y = cong (t1 x y)
 
+-- See this: https://github.com/dvanhorn/play/blob/master/agda/Rewrite.agda
+-- for examples of rewrite.
+-- Also read: http://agda.readthedocs.io/en/latest/language/with-abstraction.html#generalisation
 commute : (x y : ℕ) → ((x + y) ≡ (y + x))
 commute Z y = plus-z y
-commute (S x) Z = cong (commute x Z)
-commute (S x) (S y) = cong {!!}
+commute (S x) y rewrite t1 y x = cong (commute x y)
