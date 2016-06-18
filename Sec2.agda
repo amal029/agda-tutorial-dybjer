@@ -56,8 +56,8 @@ _>_ : ℕ → ℕ → Bool
 m > n = n < m
 
 -- XXX: == on Nat
-private _≡_ : ℕ → ℕ → Bool
-x ≡ y = (x ≥ y) & (x ≤ y)
+private _==_ : ℕ → ℕ → Bool
+x == y = (x ≥ y) & (x ≤ y)
 
 _-_ : ℕ → ℕ → ℕ
 Z - _ = Z
@@ -138,7 +138,7 @@ data _Π_ (A B : Set) : Set where
   <_,_> : (x : A) → (y : B) → A Π B
 
 
-private zip : {A B : Set} → (xs : List A) → (ys : List B) → So ((length xs) ≡ (length ys)) → List (A Π B)
+private zip : {A B : Set} → (xs : List A) → (ys : List B) → So ((length xs) == (length ys)) → List (A Π B)
 zip [] [] k = []
 zip [] (x ∷ ys) ()
 zip (x ∷ xs) [] ()
@@ -151,15 +151,34 @@ zip (x ∷ xs) (y ∷ ys) k = < x , y > ∷ zip xs ys k
 test5 : List (ℕ Π ℕ)
 test5 = zip ((1 ∷ [])) (2 ∷ []) ok
 
-data _==_ {A : Set} (x : A) : A → Set where
-  refl : x == x
+data _≡_ {A : Set} (x : A) : A → Set where
+  refl : x ≡ x
 
-plus-z : (y : ℕ) → (y == (y + Z))
+-- XXX: Transitivity of ℕ
+ℕ-trans : {x y z : ℕ} → (x ≡ y) → (y ≡ z) → (x ≡ z)
+ℕ-trans refl p2 = p2
+
+-- XXX: Symmetry of ℕ 
+sym : {x y : ℕ} → (x ≡ y) → (y ≡ x)
+sym refl = refl
+
+-- XXX: Congruence of ℕ
+cong : {x y : ℕ} → (x ≡ y) → (1 + x) ≡ (1 + y)
+cong refl = refl
+
+plus-z : (y : ℕ) → (y ≡ (y + Z))
 plus-z Z = refl
-plus-z (S y) = {!!}
+plus-z (S y) = cong (plus-z y)
 
-commute₊ : (x y : ℕ) → ((x + y) == (y + x))
-commute₊ Z Z = refl
-commute₊ Z (S y) = {!!}
-commute₊ (S x) Z = {!!}
-commute₊ (S x) (S y) = {!!}
+associativity-N : (a b c : ℕ) → ((a + b) + c) ≡ (a + (b + c))
+associativity-N Z y z = refl
+associativity-N (S x) y z = cong (associativity-N x y z)
+
+x+1+y≡y+1+x : (x y : ℕ) → (x + (1 + y)) ≡ (1 + (x + y))
+x+1+y≡y+1+x Z y = refl
+x+1+y≡y+1+x (S x) y = cong (x+1+y≡y+1+x x y)
+
+commute : (x y : ℕ) → ((x + y) ≡ (y + x))
+commute Z y = plus-z y
+commute (S x) Z = cong (commute x Z)
+commute (S x) (S y) = cong {!!}
