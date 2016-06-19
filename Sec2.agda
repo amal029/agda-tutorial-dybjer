@@ -158,32 +158,85 @@ data _≡_ {a} {A : Set a} (x : A) : A → Set a where
 {-# BUILTIN REFL     refl #-}
 
 -- XXX: Transitivity of ℕ
-ℕ-trans : {x y z : ℕ} → (x ≡ y) → (y ≡ z) → (x ≡ z)
+ℕ-trans : ∀ {x y z : ℕ} → (x ≡ y) → (y ≡ z) → (x ≡ z)
 ℕ-trans refl p2 = p2
 
 -- XXX: Symmetry of ℕ 
-sym : {x y : ℕ} → (x ≡ y) → (y ≡ x)
+sym : ∀ {x y : ℕ} → (x ≡ y) → (y ≡ x)
 sym refl = refl
 
 -- XXX: Congruence of ℕ
-cong : {x y : ℕ} → (x ≡ y) → (1 + x) ≡ (1 + y)
+cong : ∀ {x y : ℕ} → (x ≡ y) → (1 + x) ≡ (1 + y)
 cong refl = refl
 
-plus-z : (y : ℕ) → (y ≡ (y + Z))
+plus-z : ∀ (y : ℕ) → ((y + Z) ≡ y)
 plus-z Z = refl
 plus-z (S y) = cong (plus-z y)
 
-associativity-N : (a b c : ℕ) → ((a + b) + c) ≡ (a + (b + c))
-associativity-N Z y z = refl
-associativity-N (S x) y z = cong (associativity-N x y z)
+assoc-+ : ∀ (a b c : ℕ) → ((a + b) + c) ≡ (a + (b + c))
+assoc-+ Z y z = refl
+assoc-+ (S x) y z = cong (assoc-+ x y z)
 
-t1 : (x y : ℕ) → (x + S y) ≡ S (x + y)
+
+t1 : ∀ (x y : ℕ) → (x + S y) ≡ S (x + y)
 t1 Z y = refl
 t1 (S x) y = cong (t1 x y)
 
 -- See this: https://github.com/dvanhorn/play/blob/master/agda/Rewrite.agda
 -- for examples of rewrite.
 -- Also read: http://agda.readthedocs.io/en/latest/language/with-abstraction.html#generalisation
-commute : (x y : ℕ) → ((x + y) ≡ (y + x))
-commute Z y = plus-z y
-commute (S x) y rewrite t1 y x = cong (commute x y)
+commute-+ : ∀ (x y : ℕ) → ((x + y) ≡ (y + x))
+commute-+ Z y rewrite plus-z y = refl
+commute-+ (S x) y rewrite t1 y x = cong (commute-+ x y)
+
+mult-z : ∀ (y : ℕ) → ((y * Z) ≡ Z)
+mult-z Z = refl
+mult-z (S y) rewrite plus-z (y * Z) = mult-z y
+
+lemma-1 : ∀ {a b : ℕ} → ∀ (n : ℕ) → (a ≡ b) → (n + a ≡ n + b) 
+lemma-1 _ refl = refl
+
+c-* : ∀ (m n : ℕ) → (m * S n) ≡ (m * n) + m
+c-* Z n rewrite commute-+ (n * Z) Z
+                | mult-z n = refl
+c-* (S m) n rewrite
+            commute-+ (m * S n) (S n)
+            | commute-+ ((m * n) + n) (S m)
+            | commute-+ m ((m * n) + n)
+            | assoc-+ (m * n) n m
+            | commute-+  (m * n) (n + m)
+            | assoc-+ n m (m * n)
+            | commute-+ m (m * n)
+            = cong (lemma-1 n (c-* m n))
+
+
+commute-* : ∀ (m n : ℕ) → (m * n) ≡ (n * m)
+commute-* m Z = mult-z m
+commute-* m (S n) rewrite c-* m n
+                          | commute-+ (m * n) m
+                          | commute-+ (n * m) m = lemma-1 m (commute-* m n)
+
+lemma-2 : ∀ (m n x : ℕ) → (m + n) * x ≡ ((m * x) + (n * x))
+lemma-2 m n Z rewrite mult-z (m + n)
+              | mult-z m
+              | mult-z n = refl
+lemma-2 m n (S x) rewrite c-* (m + n) x
+                  | c-* m x
+                  | c-* n x
+                  | assoc-+ (m * x) m ((n * x) + n)
+                  | commute-+ m ((n * x) + n)
+                  | assoc-+ (n * x) n m
+                  | commute-+ n m
+                  | commute-+ (n * x) (m + n)
+                  | commute-+ (m * x) ((m + n) + (n * x))
+                  | assoc-+ (m + n) (n * x) (m * x)
+                  | commute-+ (m + n) ((n * x) + (m * x))
+                  | commute-+ (n * x) (m * x)
+                  | commute-+ ((m * x) + (n * x)) (m + n)
+                  | commute-+ ((m + n) * x) (m + n) = lemma-1 (m + n) (lemma-2 m n x)
+
+assoc-* : ∀ (a b c : ℕ) → ((a * b) * c) ≡ (a * (b * c)) 
+assoc-* Z b c = refl
+assoc-* (S a) b c rewrite lemma-2 (a * b) b c
+                  | commute-+ ((a * b) * c) (b * c)
+                  | commute-+ (a * (b * c)) (b * c) = lemma-1 (b * c) (assoc-* a b c)
