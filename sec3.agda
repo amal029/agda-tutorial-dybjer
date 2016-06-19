@@ -18,3 +18,4 @@ map f (x ∷ vs) = f x ∷ map f vs
 zip : {A B : Set} → {n : ℕ} → Vec A n → Vec B n → Vec (A Π B) n
 zip [] [] = []
 zip (x ∷ xs) (x₁ ∷ ys) = < x , x₁ > ∷ zip xs ys
+
