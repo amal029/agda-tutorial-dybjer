@@ -13,10 +13,10 @@ _ & F = F
 F & T = F
 T & T = T
 
-_⇒_ : Bool → Bool → Bool
-F ⇒ _ = T
-T ⇒ F = F
-T ⇒ T = T
+_==>_ : Bool → Bool → Bool
+F ==> _ = T
+T ==> F = F
+T ==> T = T
 
 
 not : Bool -> Bool
