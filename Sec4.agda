@@ -109,13 +109,16 @@ associative  = eq
                         in
                         and (and (elim1-∧ x) (elim1-∧ x1)) (elim2-∧ x1)))
 
-distributive : (P Q R : Set) → (P ∧ (Q ∨ R)) ⇔ ((P ∧ Q) ∨ (P ∧ R))
-distributive P Q R =
+distributive : {P Q R : Set} → (P ∧ (Q ∨ R)) ⇔ ((P ∧ Q) ∨ (P ∧ R))
+distributive =
                eq
                (impl (λ x →
-                        let x1 = elim1-∧ x
+                        let p = elim1-∧ x
                             x2 = elim2-∧ x
+                            x3 = elim-∨ x2 (λ q → {!!}) (λ r → {!!})
                         in
                         {!!}))
                (impl (λ x →
-                        and {!!} {!!}))
+                        let x1 = elim-∨ x (λ l → elim1-∧ l) (λ r → elim1-∧ r)
+                        in
+                        and x1 (orb {!!})))
