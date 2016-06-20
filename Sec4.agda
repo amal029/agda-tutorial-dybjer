@@ -1,5 +1,5 @@
 module Sec4 where
-open import Sec2
+-- open import Sec2
 
 -- XXX: The true type
 data ⊤ : Set where
@@ -109,6 +109,24 @@ associative  = eq
                         in
                         and (and (elim1-∧ x) (elim1-∧ x1)) (elim2-∧ x1)))
 
+-- XXX: Axiom of choice one way
+C-⇒ : {P : Set} → (P ∨ (¬ P)) ⇒ ⊤
+C-⇒ = impl (λ _ → <>)
+
+-- XXX: The proper Axiom of choice
+C-⇔ : {P : Set} → (P ∨ (¬ P)) ⇔ ⊤
+C-⇔ = eq
+      (impl (λ _ → <>))
+      -- XXX: The following proof is impossible todo
+      -- Goal: .P ∨ (¬ .P)
+      -- ————————————————————————————————————————————————————————————
+      -- x  : ⊤
+      -- .P : Set
+      (impl (λ x → {!!})) -- XXX: We do not have any proof object of P
+                          -- on the right hand side. This is the
+                          -- difference between consutrctive logic, and
+                          -- classical logic.
+
 distributive : {P Q R : Set} → (P ∧ (Q ∨ R)) ⇔ ((P ∧ Q) ∨ (P ∧ R))
 distributive =
                eq
@@ -120,5 +138,6 @@ distributive =
                         {!!}))
                (impl (λ x →
                         let x1 = elim-∨ x (λ l → elim1-∧ l) (λ r → elim1-∧ r)
+                            x2 = elim-∨ x (λ l → {!!}) (λ r → {!!})
                         in
                         and x1 (orb {!!})))
