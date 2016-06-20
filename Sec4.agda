@@ -46,7 +46,7 @@ elim-∨ : {A B C : Set} → (A ∨ B) → (A → C) → (B → C) → C
 elim-∨ (ora x) f₁ _ = f₁ x
 elim-∨ (orb x) _ f₂ = f₂ x
 
--- XXX: Eliminating conjuction
+-- XXX: Eliminating conjunction
 elim1-∧ : {A B : Set} → (A ∧ B) → A
 elim1-∧ (and x x₁) = x
 elim2-∧ : {A B : Set} → (A ∧ B) → B
@@ -73,8 +73,8 @@ ex1 {A} {B} =
                    (impl (λ x₁ → x2 x₁))))
 
 -- XXX: Transitivity
-ex2 : {A B C : Set} → ((A ⇒ B) ∧ (B ⇒ C)) ⇒ (A ⇒ C)
-ex2 = impl (λ x →
+transitive : {A B C : Set} → ((A ⇒ B) ∧ (B ⇒ C)) ⇒ (A ⇒ C)
+transitive = impl (λ x →
            let x1 = elim1-∧ x
                x2 = elim2-∧ x
            in
@@ -84,6 +84,19 @@ ex2 = impl (λ x →
                       in
                       xx2))
 
+-- XXX: Transitivity in the function space of Agda itself. Equivalent to
+-- the above one.
+trans : {A B C : Set} → ((A → B) ∧ (B → C)) → (A → C)
+trans (and x1 x2) z = let t = x1 z
+                          t1 = x2 t
+                      in t1
+
+-- XXX: Moving ∧ into Agda's space. Equivalent to transitivity and trans
+-- above.
+trans' : {A B C : Set} → (A → B) → (B → C) → (A → C)
+trans' x y = λ z → y (x z)
+
+
 -- XXX: absorption law 
 absorption : {P Q : Set} → (P ∨ (P ∧ Q)) ⇔ P
 absorption {p} {q} =
@@ -91,11 +104,11 @@ absorption {p} {q} =
                (impl (λ x → let x1 = elim-∨ x (λ p → p) (λ y → elim1-∧ y) in x1))
                (impl (λ x → ora x))
 
--- XXX: commutativity
+-- XXX: commutative
 commute : {P Q : Set} → (P ∧ Q) ⇔ (Q ∧ P)
 commute = eq (impl (λ x → and (elim2-∧ x) (elim1-∧ x))) (impl (λ x → and (elim2-∧ x) (elim1-∧ x)))
 
--- XXX: associativity 
+-- XXX: associative 
 associative : {P Q R : Set} → ((P ∧ Q) ∧ R) ⇔ (P ∧ (Q ∧ R))
 associative  = eq
                (impl (λ x →
@@ -114,18 +127,20 @@ C-⇒ : {P : Set} → (P ∨ (¬ P)) ⇒ ⊤
 C-⇒ = impl (λ _ → <>)
 
 -- XXX: The proper Axiom of choice
-C-⇔ : {P : Set} → (P ∨ (¬ P)) ⇔ ⊤
-C-⇔ = eq
+C-⇔ : {P : Set} → (x : P ∨ (¬ P)) → (P ∨ (¬ P)) ⇔ ⊤
+C-⇔ x = eq
       (impl (λ _ → <>))
       -- XXX: The following proof is impossible todo
       -- Goal: .P ∨ (¬ .P)
       -- ————————————————————————————————————————————————————————————
       -- x  : ⊤
       -- .P : Set
-      (impl (λ x → {!!})) -- XXX: We do not have any proof object of P
-                          -- on the right hand side. This is the
-                          -- difference between consutrctive logic, and
-                          -- classical logic.
+      (impl (λ _ → x)) -- XXX: We do not have any proof object of P on
+                          -- the right hand side. This is the difference
+                          -- between constructive logic, and classical
+                          -- logic. I need an explicit proof object of
+                          -- type P ∨ ¬ P (x in the example above) to
+                          -- prove the axiom of choice.
 
 distributive : {P Q R : Set} → (P ∧ (Q ∨ R)) ⇔ ((P ∧ Q) ∨ (P ∧ R))
 distributive =
