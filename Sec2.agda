@@ -240,3 +240,10 @@ assoc-* Z b c = refl
 assoc-* (S a) b c rewrite lemma-2 (a * b) b c
                   | commute-+ ((a * b) * c) (b * c)
                   | commute-+ (a * (b * c)) (b * c) = lemma-1 (b * c) (assoc-* a b c)
+
+
+distributivity-+-* : ∀ (a b c : ℕ) → (a * (b + c)) ≡ ((a * b) + (a * c))
+distributivity-+-* a b c rewrite commute-* a (b + c)
+                         | commute-* a b
+                         | commute-* a c
+                         | lemma-2 b c a = refl
