@@ -87,6 +87,19 @@ ex2 = impl (λ x →
                       in
                       xx2))
 
+-- XXX: Transitivity in the function space of Agda itself. Equivalent to
+-- the above one.
+trans : {A B C : Set} → ((A → B) ∧ (B → C)) → (A → C)
+trans (and x1 x2) z = let t = x1 z
+                          t1 = x2 t
+                      in t1
+
+-- XXX: Moving ∧ into Agda's space. Equivalent to transitivity and trans
+-- above.
+trans' : {A B C : Set} → (A → B) → (B → C) → (A → C)
+trans' x y = λ z → y (x z)
+
+
 -- XXX: absorption law 
 absorption : {P Q : Prop} → (P ∨ (P ∧ Q)) ⇔ P
 absorption {p} {q} =
