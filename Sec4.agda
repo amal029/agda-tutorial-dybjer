@@ -185,14 +185,70 @@ elim2-exists : {A : Prop} → {B : A → Prop} → (p : Exists A B) → (B (elim
 elim2-exists [ _ , x ] = x
 
 -- TODO: Proofs in predicate logic
-pex0 : {X : Set} → {P : X → Prop} → (Exists X (λ (x : X) → (¬ P x))) ⇒ (¬ (ForAll X P))
-pex0 = {!!}
 
+-- XXX: model-checking depends on this theorem
+mthm : {V : Set} → {P : V → Prop} → (Exists V (λ (x : V) → (¬ P x)))
+                                   ⇒ (¬ ForAll V P)
+mthm = impl (λ x →
+            neg (impl (λ x₁ →
+                      let x1 = elim2-exists x
+                          x2 = elim1-exists x
+                          x3 = elim-ForAll x2 x₁
+                      in
+                      elim-neg x3 x1)))
+
+
+pex0 : {X : Set} → {P : X → Prop} → (¬ (Exists X P)) ⇒ (ForAll X (λ x → (¬ P x)))
+pex0  = impl (λ x →
+             dfun (λ x₁ →
+                  neg (impl (λ x₂ →
+                            let x1 = elim-neg [ x₁ , x₂ ] x
+                            in
+                            x1))))
+
+pex0' : {X : Set} → {P : X → Prop} →  (ForAll X (λ x → (¬ P x))) ⇒ (¬ (Exists X P))
+pex0' = impl (λ x →
+             neg (impl
+                 (λ x₁ →
+                 let x1 = elim1-exists x₁
+                     x1' = elim2-exists x₁
+                     x2 = elim-ForAll x1 x
+                 in
+                 elim-neg x1' x2)))
+
+-- XXX: Understand this manually.
 pex2 : {X Y : Set} → {P : X → Y → Prop} → (Exists Y (λ (y : Y) → (ForAll X (λ (x : X) → P x y))))
                                         ⇒ (ForAll X (λ (x : X) → (Exists Y (λ (y : Y) → P x y))))
-pex2 = {!!}
+pex2 = impl (λ x →
+            dfun (λ x₁ →
+                 let x1 = elim1-exists x
+                     x2 = elim2-exists x
+                     x3 = elim-ForAll x₁ x2
+                 in
+                 [ x1 , x3 ]))
 
--- TODO: Tautology in FOL predicate logic
-ptau : {V B : Set} → {A : V → Prop} → (ForAll V (λ (x : V) → (A x) ⇒ B))
-                                    ⇔ (Exists V A ⇒ B)
-ptau = {!!}
+-- TODO: Tautology in first order predicate logic
+-- XXX: Don't know if I am wrong or if it cannot be done in constructive logic?
+-- XXX: Going from ∃ ⇒ ∀ does not make any sense below.
+-- XXX: Going from ∀ ⇒ ∃ needs an assumption of (x : V); Why?
+ptau : {V B : Set} → {A : V → Prop} → (x : V) → (ForAll V (λ _ → (A x) ⇒ B))
+                                    ⇔ (Exists V (λ _ → (A x) ⇒ B))
+ptau a = eq
+       (impl (λ x →
+             let
+               x1 = elim-ForAll a x
+             in
+             [ a , (impl (λ x₁ →
+                            elim-⇒ x1 x₁)) ]))
+       (impl (λ x → dfun (λ x₁ → impl (λ x₂ →
+                                      let
+                                        x1 = elim2-exists x
+                                        x2 = elim-⇒ x1 {!!} -- FIXME:
+                                                            -- This can
+                                                            -- never be
+                                                            -- filled, I
+                                                            -- think,
+                                                            -- which is
+                                                            -- correct.
+                                      in
+                                      x2))))
