@@ -186,6 +186,7 @@ elim2-exists [ _ , x ] = x
 
 -- TODO: Proofs in predicate logic
 
+
 -- XXX: model-checking depends on this theorem
 mthm : {V : Set} → {P : V → Prop} → (Exists V (λ (x : V) → (¬ P x)))
                                    ⇒ (¬ ForAll V P)
@@ -243,12 +244,5 @@ ptau a = eq
        (impl (λ x → dfun (λ x₁ → impl (λ x₂ →
                                       let
                                         x1 = elim2-exists x
-                                        x2 = elim-⇒ x1 {!!} -- FIXME:
-                                                            -- This can
-                                                            -- never be
-                                                            -- filled, I
-                                                            -- think,
-                                                            -- which is
-                                                            -- correct.
-                                      in
-                                      x2))))
+                                        x2 = elim-⇒ x1 x₂
+                                      in x2))))
