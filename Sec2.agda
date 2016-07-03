@@ -103,12 +103,24 @@ if_then_else_ : {A : Set} → Bool → A → A → A
 if T then x else _ = x
 if F then _ else y = y
   
-
 private filter : {A : Set} → (A → Bool) → List A → List A
 filter cmp [] = []
 filter cmp (x ∷ x₁) = if (cmp x) 
                       then x ∷ (filter cmp x₁)
                       else filter cmp x₁
+
+_++_ : {A : Set} →  List A → List A → List A
+[] ++ r = r
+(x ∷ l) ++ r = x ∷ (l ++ r)
+
+insert : (a : ℕ) → (List ℕ) → (List ℕ)
+insert a [] = (a ∷ [])
+insert a (x ∷ l) = if (a ≤ x)
+                   then (a ∷ (x ∷ l))
+                   else (x ∷ (insert a l))
+
+tt2 : List ℕ
+tt2 = insert 9 (0 ∷ (8 ∷ []))
 
 private foldl : {A : Set} → (A → A → A) → List A → A → A
 foldl _ [] y = y

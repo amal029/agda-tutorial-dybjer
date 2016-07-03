@@ -6,7 +6,7 @@ Prop = Set
 
 -- XXX: The true type
 data ⊤ : Prop where
-  <> : ⊤
+  ⋆ : ⊤
 
 -- XXX: The false type
 data ⊥ : Prop where
@@ -134,7 +134,7 @@ f = impl (λ x → neg (impl (λ x₁ → elim-neg x x₁)))
 
 -- XXX: Axiom of choice one way
 C-⇒ : {P : Prop} → (P ∨ (¬ P)) ⇒ ⊤
-C-⇒ = impl (λ _ → <>)
+C-⇒ = impl (λ _ → ⋆)
 
 -- XXX: The proper Axiom of choice
 -- C-⇔ : {P : Prop} → (P ∨ (¬ P)) ⇔ ⊤
@@ -150,20 +150,20 @@ C-⇒ = impl (λ _ → <>)
 --                           -- difference between constructive logic, and
 --                           -- classical logic.
 
-distributive : {P Q R : Prop} → (P ∧ (Q ∨ R)) ⇔ ((P ∧ Q) ∨ (P ∧ R))
-distributive =
-               eq
-               (impl (λ x →
-                        let p = elim1-∧ x
-                            x2 = elim2-∧ x
-                            x3 = elim-∨ x2 (λ q → q) _ 
-                        in
-                        ora (and p x3)))
-               (impl (λ x →
-                        let x1 = elim-∨ x (λ l → elim1-∧ l) (λ r → elim1-∧ r)
-                            x2 = elim-∨ x _ (λ r → elim2-∧ r)
-                        in
-                        and x1 (orb x2)))
+-- distributive : {p q r : prop} → (p ∧ (q ∨ r)) ⇔ ((p ∧ q) ∨ (p ∧ r))
+-- distributive =
+--                eq
+--                (impl (λ x →
+--                         let p = elim1-∧ x
+--                             x2 = elim2-∧ x
+--                             x3 = elim-∨ x2 (λ q → q) _ 
+--                         in
+--                         ora (and p x3)))
+--                (impl (λ x →
+--                         let x1 = elim-∨ x (λ l → elim1-∧ l) (λ r → elim1-∧ r)
+--                             x2 = elim-∨ x _ (λ r → elim2-∧ r)
+--                         in
+--                         and x1 (orb x2)))
 
 
 -- XXX: Predicate logic
@@ -217,7 +217,6 @@ pex0' = impl (λ x →
                  in
                  elim-neg x1' x2)))
 
--- XXX: Understand this manually.
 pex2 : {X Y : Set} → {P : X → Y → Prop} → (Exists Y (λ (y : Y) → (ForAll X (λ (x : X) → P x y))))
                                         ⇒ (ForAll X (λ (x : X) → (Exists Y (λ (y : Y) → P x y))))
 pex2 = impl (λ x →
@@ -229,9 +228,6 @@ pex2 = impl (λ x →
                  [ x1 , x3 ]))
 
 -- TODO: Tautology in first order predicate logic
--- XXX: Don't know if I am wrong or if it cannot be done in constructive logic?
--- XXX: Going from ∃ ⇒ ∀ does not make any sense below.
--- XXX: Going from ∀ ⇒ ∃ needs an assumption of (x : V); Why?
 ptau : {V B : Set} → {A : V → Prop} → (x : V) → (ForAll V (λ _ → (A x) ⇒ B))
                                     ⇔ (Exists V (λ _ → (A x) ⇒ B))
 ptau a = eq
