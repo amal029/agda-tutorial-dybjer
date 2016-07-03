@@ -1,0 +1,8 @@
+* List of things todo:
+- [ ] Write the delete function for Binary Tree
+- [ ] Prove that the order is maintained by delete function
+- [ ] Write the delete function in list
+- [ ] Prove that the order is maintained by the delete function
+- [ ] Write the sort algorithm
+- [ ] Prove that the sort algorithm actually sorts the list
+- [ ] Write some relations and proofs for the Natural numbers using propositions.
