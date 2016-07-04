@@ -1,4 +1,4 @@
-* List of things todo:
+* List of things todo [0%]
 - [ ] Write the delete function for Binary Tree
 - [ ] Prove that the order is maintained by delete function
 - [ ] Write the delete function in list
