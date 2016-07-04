@@ -60,4 +60,61 @@ module Sort where
                                    in
                                    and (lem2 x a l h x₁ x₂ v) v
 
+-- XXX: append lists
+  _++_ : {A : Set} → (l : List A) → (m : List A) → List A
+  Nil ++ m = m
+  (x ∷ l) ++ m = x ∷ (l ++ m)
+
+-- XXX: Length of a list
+  length : {A : Set} → (l : List A) → Sec2.ℕ
+  length Nil = Sec2.Z
+  length (x ∷ l) = Sec2.S (length l)
+
+
+-- XXX: reverse of a list
+  rev : {A : Set} → (List A) → (List A)
+  rev Nil = Nil
+  rev (x ∷ l) = (rev l) ++ (x ∷ Nil)
+
+-- XXX: Theorem on length of lists
+  thm : {A : Set} → (l : List A) → (m : List A) → ((length l) Sec2.+ (length m) Sec2.≡ length (l ++ m))
+  thm Nil m = Sec2.refl
+  thm (x ∷ l) m =
+                let
+                  xx = thm l m
+                in
+                Sec2.cong xx
+
+  cong : {A : Set} → (x : A) → (l m : List A) → (l Sec2.≡ m)
+         → (x ∷ l) Sec2.≡ (x ∷ m)
+  cong x l .l Sec2.refl = Sec2.refl
+
+  cong2 : {A : Set} → (l m q : List A) → (l Sec2.≡ m)
+          → (l ++ q) Sec2.≡ (m ++ q)
+  cong2 l .l q Sec2.refl = Sec2.refl
+
+  ++-lem : {A : Set} → (l : List A) → ((l ++ Nil) Sec2.≡ l)
+  ++-lem Nil = Sec2.refl
+  ++-lem (x ∷ l) = cong x (l ++ Nil) l (++-lem l)
+
+  assoc : {A : Set} → (l m q : List A)
+          → l ++ (m ++ q) Sec2.≡ (l ++ m) ++ q 
+  assoc Nil m q = Sec2.refl
+  assoc (x ∷ l) m q = cong x (l ++ (m ++ q)) ((l ++ m) ++ q) (assoc l m q)
+
+  rev-lem : {A : Set} → ∀ (l m : List A)
+            → rev (l ++ m) Sec2.≡ (rev m) ++ (rev l)
+  rev-lem Nil m rewrite
+                ++-lem (rev m) = Sec2.refl
+  rev-lem (x ∷ l) m rewrite
+                    assoc (rev m) (rev l) (x ∷ Nil)
+                    = let p = rev-lem l m in
+                      cong2 (rev (l ++ m)) (rev m ++ rev l) (x ∷ Nil) p
+
+-- XXX: Involution of reversal of lists
+  rev-involute : {A : Set} → (l : List A) → l Sec2.≡ (rev (rev l))
+  rev-involute Nil = Sec2.refl
+  rev-involute (x ∷ l) rewrite 
+                       rev-lem (rev l) (x ∷ Nil)
+                       = cong x l (rev (rev l)) (rev-involute l)
 
