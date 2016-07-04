@@ -1,4 +1,5 @@
 module Sec2 where
+open import Sec4
 data Bool : Set where
   T : Bool
   F : Bool
@@ -259,3 +260,29 @@ distributivity-+-* a b c rewrite commute-* a (b + c)
                          | commute-* a b
                          | commute-* a c
                          | lemma-2 b c a = refl
+
+-- XXX: factorial function on naturals
+fact : ∀ (x : ℕ) → ℕ
+fact Z = (S Z)
+fact (S Z) = (S Z)
+fact (S x) = x * (fact x)
+
+-- TODO: Relation on ℕ and >
+_>⋆_ : ℕ → ℕ → Prop
+Z >⋆ Z = ⊥
+S x >⋆ Z = ⊤
+Z >⋆ S y = ⊥
+S x >⋆ S y = x >⋆ y
+
+lem : (m n : ℕ) → (p : n >⋆ Z) → (m + n) >⋆ 0
+lem Z n p = p
+lem (S m) n p = ⋆
+
+-- XXX: Theorem; factorial of any natural number is > 0
+-- XXX: page-124, problem 4.35, Type Theory and functional programming
+thm : ∀ (x : ℕ) → (fact x) >⋆ Z
+thm Z = ⋆
+thm (S Z) = ⋆
+thm (S (S x)) =
+              let p = thm (S x) in
+              lem (x * fact (S x)) (fact (S x)) p
