@@ -283,6 +283,4 @@ lem (S m) n p = ⋆
 thm : ∀ (x : ℕ) → (fact x) >⋆ Z
 thm Z = ⋆
 thm (S Z) = ⋆
-thm (S (S x)) =
-              let p = thm (S x) in
-              lem (x * fact (S x)) (fact (S x)) p
+thm (S (S x)) = lem (x * fact (S x)) (fact (S x)) (thm (S x))
