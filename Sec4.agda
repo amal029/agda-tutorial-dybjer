@@ -4,6 +4,9 @@ module Sec4 where
 Prop : Set₁
 Prop = Set
 
+Value : Set₁
+Value = Set
+
 -- XXX: The true type
 data ⊤ : Prop where
   ⋆ : ⊤
@@ -23,6 +26,8 @@ data _∨_ (A B : Prop) : Prop where
 -- XXX: implication
 data _⇒_ (A B : Prop) : Prop where
   impl : (f : A → B) → A ⇒ B
+
+infixr 2 _⇒_
   
 -- XXX: equivalence
 data _⇔_ (A B : Prop) : Prop where
@@ -39,9 +44,9 @@ elim-⇒ : {A B : Prop} → (f₁ : A ⇒ B) → A → B
 elim-⇒ (impl f) x = f x
 
 elim1-⇔ : {A B : Prop} → (A ⇔ B) → A → B
-elim1-⇔ (eq (impl f) (impl f₁)) = λ x → f x
+elim1-⇔ (eq (impl f) _) x = f x
 elim2-⇔ : {A B : Prop} → (A ⇔ B) → B → A
-elim2-⇔ (eq (impl f) (impl f₁)) = λ x → f₁ x
+elim2-⇔ (eq _ (impl f₁)) x = f₁ x
 
 
 -- XXX: Eliminating disjunction
@@ -78,14 +83,7 @@ ex1 {A} {B} =
 -- XXX: Transitivity
 ex2 : {A B C : Prop} → ((A ⇒ B) ∧ (B ⇒ C)) ⇒ (A ⇒ C)
 ex2 = impl (λ x →
-           let x1 = elim1-∧ x
-               x2 = elim2-∧ x
-           in
-           impl (λ x₁ →
-                      let xx1 = elim-⇒ x1 x₁
-                          xx2 = elim-⇒ x2 xx1
-                      in
-                      xx2))
+           impl (λ x₁ → elim-⇒ (elim2-∧ x) (elim-⇒ (elim1-∧ x) x₁)))
 
 -- XXX: Transitivity in the function space of Agda itself. Equivalent to
 -- the above one.
@@ -93,6 +91,13 @@ trans : {A B C : Set} → ((A → B) ∧ (B → C)) → (A → C)
 trans (and x1 x2) z = let t = x1 z
                           t1 = x2 t
                       in t1
+-- (elim-⇒ x x₂)
+transitivity : {A B C : Prop} → (A ⇒ B) ⇒ (B ⇒ C) ⇒ (A ⇒ C)
+transitivity = impl (λ x →
+                    impl
+                      (λ x₁ → impl
+                              (λ x₂ →
+                                elim-⇒ x₁ (elim-⇒ x x₂))))
 
 -- XXX: Moving ∧ into Agda's space. Equivalent to transitivity and trans
 -- above.
@@ -109,21 +114,18 @@ absorption {p} {q} =
 
 -- XXX: commutativity
 commute : {P Q : Prop} → (P ∧ Q) ⇔ (Q ∧ P)
-commute = eq (impl (λ x → and (elim2-∧ x) (elim1-∧ x))) (impl (λ x → and (elim2-∧ x) (elim1-∧ x)))
+commute = eq (impl (λ x → and (elim2-∧ x) (elim1-∧ x)))
+             (impl (λ x → and (elim2-∧ x) (elim1-∧ x)))
 
 -- XXX: associativity 
 associative : {P Q R : Prop} → ((P ∧ Q) ∧ R) ⇔ (P ∧ (Q ∧ R))
 associative  = eq
                (impl (λ x →
-                        let x1 = elim1-∧ x
-                            x2 = elim1-∧ x1
-                            x3 = elim2-∧ x1
-                        in
-                        and x2 (and x3 (elim2-∧ x))))
+                        and (elim1-∧ (elim1-∧ x))
+                            (and (elim2-∧ (elim1-∧ x)) (elim2-∧ x))))
                (impl (λ x →
-                        let x1 = elim2-∧ x
-                        in
-                        and (and (elim1-∧ x) (elim1-∧ x1)) (elim2-∧ x1)))
+                        and (and (elim1-∧ x) (elim1-∧ (elim2-∧ x)))
+                            (elim2-∧ (elim2-∧ x))))
 
 elim-neg : {A : Prop} → A → (¬ A) → ⊥
 elim-neg y (neg x) = elim-⇒ x y
@@ -132,14 +134,25 @@ elim-neg y (neg x) = elim-⇒ x y
 f : {A : Prop} → A ⇒ (¬ (¬ A))
 f = impl (λ x → neg (impl (λ x₁ → elim-neg x x₁)))
 
+-- A⇔¬¬A : {A : Prop} → A ⇔ (¬ (¬ A))
+-- A⇔¬¬A = eq (impl (λ x → neg (impl (λ x₁ → elim-neg x x₁))))
+--            (impl (λ x → {!!}))
+
+-- A⇔A⇒⊥⇒⊥ : {A : Prop} → (A ⇔ ((A ⇒ ⊥) ⇒ ⊥))
+-- A⇔A⇒⊥⇒⊥ = eq (impl (λ x → impl (λ x₁ → elim-⇒ x₁ x)))
+--          (impl (λ x → {!!}))
+
+-- AC⇒Contra : {A : Prop} → (A ∨ (¬ A)) ⇒ ((¬ (¬ A)) ⇒ A)
+-- AC⇒Contra = impl (λ x → impl (λ x₁ → {!!}))
+
 -- XXX: Axiom of choice one way
 C-⇒ : {P : Prop} → (P ∨ (¬ P)) ⇒ ⊤
 C-⇒ = impl (λ _ → ⋆)
 
--- XXX: The proper Axiom of choice
+-- XXX: Axiom of choice
 -- C-⇔ : {P : Prop} → (P ∨ (¬ P)) ⇔ ⊤
 -- C-⇔ = eq
---       (impl (λ _ → <>))
+--       (impl (λ _ → ⋆))
 --       -- XXX: The following proof is impossible todo
 --       -- Goal: .P ∨ (¬ .P)
 --       -- ————————————————————————————————————————————————————————————
@@ -165,6 +178,12 @@ C-⇒ = impl (λ _ → ⋆)
 --                         in
 --                         and x1 (orb x2)))
 
+and-⇒ : {A B : Prop} → (A ∧ B) ⇒ (A ⇒ B)
+and-⇒ = impl (λ x → impl (λ x₁ → elim2-∧ x))
+
+
+-- contradiction : {A : Prop} → (¬ (¬ A)) ⇒ A
+-- contradiction = impl (λ x → {!!})
 
 -- XXX: Predicate logic
 -- XXX: For all introduction
@@ -188,15 +207,11 @@ elim2-exists [ _ , x ] = x
 
 
 -- XXX: model-checking depends on this theorem
-mthm : {V : Set} → {P : V → Prop} → (Exists V (λ (x : V) → (¬ P x)))
+mthm : {V : Value} → {P : V → Prop} → (Exists V (λ (x : V) → (¬ P x)))
                                    ⇒ (¬ ForAll V P)
 mthm = impl (λ x →
             neg (impl (λ x₁ →
-                      let x1 = elim2-exists x
-                          x2 = elim1-exists x
-                          x3 = elim-ForAll x2 x₁
-                      in
-                      elim-neg x3 x1)))
+                      elim-neg (elim-ForAll (elim1-exists x) x₁) (elim2-exists x))))
 
 
 pex0 : {X : Set} → {P : X → Prop} → (¬ (Exists X P)) ⇒ (ForAll X (λ x → (¬ P x)))
@@ -228,20 +243,12 @@ pex2 = impl (λ x →
                  [ x1 , x3 ]))
 
 -- TODO: Tautology in first order predicate logic
-ptau : {V B : Set} → {A : V → Prop} → (x : V) → (ForAll V (λ _ → (A x) ⇒ B))
-                                    ⇔ (Exists V (λ _ → (A x) ⇒ B))
+ptau : {V B : Value} → {A : V → Prop} → (x : V)
+                     → (ForAll V (λ _ → (A x) ⇒ B))
+                     ⇔ (Exists V (λ _ → (A x) ⇒ B))
 ptau a = eq
        (impl (λ x →
-             let
-               x1 = elim-ForAll a x
-             in
              [ a , (impl (λ x₁ →
-                            elim-⇒ x1 x₁)) ]))
+                            elim-⇒ (elim-ForAll a x) x₁)) ]))
        (impl (λ x → dfun (λ x₁ → impl (λ x₂ →
-                                      let
-                                        x1 = elim2-exists x
-                                        x2 = elim-⇒ x1 x₂
-                                      in x2))))
-
-
-
+                                      elim-⇒ (elim2-exists x) x₂))))
