@@ -162,14 +162,24 @@ sorted-list : {A : Set} → List A → Prop
 sorted-list [] = ⊤
 sorted-list (x ∷ l) = (all-sorted-list x l) ∧ (sorted-list l)
 
+
+lem-qsort : (l : List ℕ) → (x : ℕ) →
+  sorted-list
+      ((qsort' (length l) (elim1-exists (filter (leq-nat x) l))
+        (≤-trans (length (elim1-exists (filter (leq-nat x) l))) (length l)
+         (length l) (elim2-exists (filter (leq-nat x) l)) (l' l))
+        ++ (x ∷ []))
+       ++
+       qsort' (length l) (elim1-exists (filter (_>_ x) l))
+       (≤-trans (length (elim1-exists (filter (_>_ x) l))) (length l)
+        (length l) (elim2-exists (filter (_>_ x) l)) (l' l)))
+lem-qsort [] x = and ⋆ ⋆
+lem-qsort (x ∷ l) x₁ = {!!}
+
 -- Theorem that given a list qsort will actually sort the list
 thm-qsort : ∀ (l : List ℕ) → sorted-list (qsort l)
 thm-qsort [] = ⋆
-thm-qsort (x ∷ l) =
-                  let
-                    p = thm-qsort l
-                  in
-                  {!!}
+thm-qsort (x ∷ l) = lem-qsort l x 
 
 
 
