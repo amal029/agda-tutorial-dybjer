@@ -58,7 +58,7 @@ S x ≤ S y = x ≤ y
 
 -- ≤ is reflexive
 ≤-ref : ∀ (x : ℕ) → (x ≤ x) → (x ≤ x)
-≤-ref x = λ z → z
+≤-ref _ y = y
 
 -- ≤ is not symmetric
 -- ≤-sym : ∀ (x y : ℕ) → (x ≤ y) → (y ≤ x)
@@ -124,16 +124,31 @@ Z < Z = False
 _>_ : ℕ → ℕ → Bool
 m > n = n < m
 
--- The sorting algorithm
-qsort' : (l : List ℕ) → List ℕ
-qsort' [] = []
-qsort' (x ∷ l) =
-              let
-                left = qsort' (elim1-exists (filter (leq-nat x) l))
-                right = qsort' (elim1-exists (filter ((_>_) x) l))
-              in
-              (left ++ (x ∷ [])) ++ right
 
+-- The sorting algorithm
+-- The trick here is that we are reducing qsort on "n"
+qsort' : ∀ (n : ℕ) → ∀ (l : List ℕ) → (p : (length l) ≤ n) → (List ℕ)
+qsort' Z [] p = []
+qsort' Z (x ∷ l) ()
+qsort' (S n) [] p = []
+qsort' (S n) (x ∷ l) p =
+                       let
+                         ll = (filter (leq-nat x) l)
+                         rr = (filter ((_>_) x) l)
+                         pl = elim2-exists ll
+                         pr = elim2-exists rr
+                         left = qsort' n (elim1-exists ll) (≤-trans (length (elim1-exists ll)) (length l) n pl p)
+                         right = qsort' n (elim1-exists rr) (≤-trans (length (elim1-exists rr)) (length l) n pr p)
+                       in
+                       (left ++ (x ∷ [])) ++ right
+
+
+l' : {A : Set} → (l : List A) → (length l ≤ length l)
+l' [] = ⋆
+l' (x ∷ l) = l' l
+
+qsort : ∀ (l : List ℕ) → List ℕ
+qsort l = qsort' (length l) l (l' l)
 
 -- XXX: definition of an sorted list
 all-sorted-list : {A : Set} → (a : A)
@@ -145,3 +160,12 @@ all-sorted-list a (x ∷ l) = leq a x ∧ (all-sorted-list a l)
 sorted-list : {A : Set} → List A → Prop
 sorted-list [] = ⊤
 sorted-list (x ∷ l) = (all-sorted-list x l) ∧ (sorted-list l)
+
+-- Theorem that given a list qsort will actually sort the list
+thm-qsort : ∀ (l : List ℕ) → sorted-list (qsort l)
+thm-qsort [] = ⋆
+thm-qsort (x ∷ l) =
+                  let
+                    p = thm-qsort l
+                  in
+                  {!!}
