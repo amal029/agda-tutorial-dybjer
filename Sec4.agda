@@ -242,3 +242,6 @@ ptau a = eq
                                         x1 = elim2-exists x
                                         x2 = elim-⇒ x1 x₂
                                       in x2))))
+
+
+
