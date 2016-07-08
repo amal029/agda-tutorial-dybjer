@@ -106,6 +106,7 @@ filter : {A : Set} → (A → Bool) → (l : List A)
 filter f [] = [ [] , ⋆ ]
 filter f (x ∷ l) = [ filter' f l , thm-filter' l f ]
 
+-- append two lists
 _++_ : {A : Set} → (l : List A) → (l' : List A) → (List A)
 [] ++ l' = l'
 (x ∷ l) ++ l' = (x ∷ (l ++ l'))
@@ -169,3 +170,6 @@ thm-qsort (x ∷ l) =
                     p = thm-qsort l
                   in
                   {!!}
+
+
+
