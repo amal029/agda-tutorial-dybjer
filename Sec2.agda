@@ -57,7 +57,7 @@ _>_ : ℕ → ℕ → Bool
 m > n = n < m
 
 -- XXX: == on Nat
-private _==_ : ℕ → ℕ → Bool
+_==_ : ℕ → ℕ → Bool
 x == y = (x ≥ y) & (x ≤ y)
 
 _-_ : ℕ → ℕ → ℕ

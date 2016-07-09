@@ -10,6 +10,9 @@ data List (A : Set) : Set where
   _∷_ : A → List A → List A     -- Cons
 
 
+infixr 4 _∷_
+
+
 -- Proposition stating what is a non empty list
 nelist : {A : Set} → (List A) → Prop
 nelist [] = ⊥
@@ -60,8 +63,8 @@ Sec2.Z >= Sec2.S y = ⊥
 Sec2.S x >= y = x >= y
 
 -- Indexing into the list
-_!!_ : {A : Set} → (l : List A) → (i : Sec2.ℕ) → (nelist l)
-                 → Exists A (λ _ → ((i >= Sec2.Z) ∧ (i <= (length l))))
+_!!_ : {A : Set} → ∀ (l : List A) → ∀ (i : Sec2.ℕ) → (nelist l)
+                 → Exists A (λ _  → ((i >= Sec2.Z) ∧ (i <= (length l))))
 ([] !! i) () 
 ((x ∷ l) !! i) ⋆ = [ x , (and (lem1 i) (lem (x ∷ l) i))]
   where
@@ -83,6 +86,35 @@ _!!_ : {A : Set} → (l : List A) → (i : Sec2.ℕ) → (nelist l)
   lem [] (Sec2.S i) = lem2 i
   lem (x₁ ∷ l₁) i = cong-<= i (length l₁) (lem l₁ i)
 
+
+data Maybe (A : Set) : Set where
+  Nothing : Maybe A
+  Just : A → Maybe A
+
+index : {A : Set} → ∀ (l : List A)
+                  → (nelist l)
+                  → ∀ (i : Sec2.ℕ)
+                  → Sec2.So ((i Sec2.≥ Sec2.Z) Sec2.& (i Sec2.< (length l)))
+                  → Maybe A
+index l _ i _ = index' l i (Sec2.Z)
+  where
+  index' : {A : Set} → ∀ (l : List A) → ∀(i : Sec2.ℕ)
+                     → (c : Sec2.ℕ) → Maybe A
+  index' [] i₁ c = Nothing
+  index' (x₁ ∷ l₁) i₁ c with (i₁ Sec2.== c) 
+  index' (x₁ ∷ l₁) i₁ c | Sec2.T = Just x₁
+  index' (x₁ ∷ l₁) i₁ c | Sec2.F = index' l₁ i₁ (Sec2.S c)
+
+exx1 : Maybe Sec2.ℕ
+exx1 = index (1 ∷ []) ⋆ 0 Sec2.ok
+
+index'' : {A : Set} → ∀ (l : List A)
+                  → ∀ (i : Sec2.ℕ)
+                  → (nelist l)
+                  → Sec2.So ((i Sec2.≥ Sec2.Z) Sec2.& (i Sec2.< (length l)))
+                  → A
+index'' [] i () x
+index'' (x ∷ l) i ⋆ x₁ = {!!}
 
 -- append two lists
 _++_ : {A : Set} → (l : List A) → (l' : List A) → (List A)

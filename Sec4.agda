@@ -130,6 +130,16 @@ associative  = eq
 elim-neg : {A : Prop} → A → (¬ A) → ⊥
 elim-neg y (neg x) = elim-⇒ x y
 
+
+-- tt : {A : Prop} → (A ∨ (¬ A)) → (¬ (¬ A)) → A
+-- tt (ora x) (neg y) = x
+-- tt {A} (orb x) (neg y) =
+--                        let
+--                          z = elim-⇒ y x
+--                          t = elim-neg {!!} x
+--                        in
+--                        {!!}
+
 -- XXX: A ⇒ ¬¬ A
 f : {A : Prop} → A ⇒ (¬ (¬ A))
 f = impl (λ x → neg (impl (λ x₁ → elim-neg x x₁)))
