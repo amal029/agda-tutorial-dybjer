@@ -163,6 +163,18 @@ sorted-list [] = ⊤
 sorted-list (x ∷ l) = (all-sorted-list x l) ∧ (sorted-list l)
 
 
+lem-qsort' : (x₁ : ℕ) → (l : List ℕ) → sorted-list
+      ((qsort' (S (length l)) (filter' (leq-nat x₁) l)
+        (≤-trans (length (filter' (leq-nat x₁) l)) (S (length l))
+         (S (length l)) (thm-filter' l (leq-nat x₁)) (l' l))
+        ++ (x₁ ∷ []))
+       ++
+       qsort' (S (length l)) (filter' (_>_ x₁) l)
+       (≤-trans (length (filter' (_>_ x₁) l)) (S (length l))
+        (S (length l)) (thm-filter' l (_>_ x₁)) (l' l)))
+lem-qsort' x [] = and ⋆ ⋆
+lem-qsort' x (x₁ ∷ l) = {!!}
+
 lem-qsort : (l : List ℕ) → (x : ℕ) →
   sorted-list
       ((qsort' (length l) (elim1-exists (filter (leq-nat x) l))
@@ -174,9 +186,9 @@ lem-qsort : (l : List ℕ) → (x : ℕ) →
        (≤-trans (length (elim1-exists (filter (_>_ x) l))) (length l)
         (length l) (elim2-exists (filter (_>_ x) l)) (l' l)))
 lem-qsort [] x = and ⋆ ⋆
-lem-qsort (x ∷ l) x₁ = {!!}
+lem-qsort (x ∷ l) x₁ = lem-qsort' x₁ l
 
--- Theorem that given a list qsort will actually sort the list
+-- Theorem that given a list, qsort will actually sort the list
 thm-qsort : ∀ (l : List ℕ) → sorted-list (qsort l)
 thm-qsort [] = ⋆
 thm-qsort (x ∷ l) = lem-qsort l x 

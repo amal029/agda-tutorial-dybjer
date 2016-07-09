@@ -55,8 +55,8 @@ _++_ : {A : Set} → (l : List A) → (l' : List A) → (List A)
 
 
 -- composition of two functions
-_∘_ : {A B C : Set} → (B → C) → (A → B) → (A → C)
-g ∘ f = λ x → (g (f x))
+_∘_ : {A B C : Set} → (A → B) → (B → C) → (A → C)
+f ∘ g = λ x → (g (f x))
 
 
 cong : {A : Set} → (x : A) → (l m : List A) → (l Sec2.≡ m) → (x ∷ l) Sec2.≡ (x ∷ m)
@@ -70,4 +70,9 @@ thm1-map f [] m = Sec2.refl
 thm1-map f (x ∷ l) m with (f x)
 thm1-map f (x ∷ l) m | p  = cong p (map f (l ++ m)) (map f l ++ map f m) (thm1-map f l m)
 
+-- map ∘
+thm2-map : {A B C : Set} → (f : A → B) → (g : B → C) → (l : List A) → (map (f ∘ g) l Sec2.≡ ((map f) ∘ (map g)) l)
+thm2-map f₁ g₁ [] = Sec2.refl
+thm2-map f₁ g₁ (x ∷ l) with (thm2-map f₁ g₁ l)
+thm2-map f₁ g₁ (x ∷ l) | p = cong (g₁ (f₁ x)) (map (λ z → g₁ (f₁ z)) l) (map g₁ (map f₁ l)) p
 
