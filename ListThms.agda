@@ -48,6 +48,42 @@ length : {A : Set} → (List A) → Sec2.ℕ
 length [] = Sec2.Z
 length (x ∷ l) = (Sec2.S Sec2.Z) Sec2.+ (length l)
 
+-- Proposition on ≤
+_<=_ : Sec2.ℕ  → Sec2.ℕ → Prop
+Sec2.Z <= Sec2.Z = ⊤
+Sec2.Z <= Sec2.S y = ⊤
+Sec2.S x <= y = x <= y
+
+_>=_ : Sec2.ℕ  → Sec2.ℕ → Prop
+Sec2.Z >= Sec2.Z = ⊤
+Sec2.Z >= Sec2.S y = ⊥
+Sec2.S x >= y = x >= y
+
+-- Indexing into the list
+_!!_ : {A : Set} → (l : List A) → (i : Sec2.ℕ) → (nelist l)
+                 → Exists A (λ _ → ((i >= Sec2.Z) ∧ (i <= (length l))))
+([] !! i) () 
+((x ∷ l) !! i) ⋆ = [ x , (and (lem1 i) (lem (x ∷ l) i))]
+  where
+  cong-<= : (x y : Sec2.ℕ) → (x <= y) → (x <= Sec2.S y)
+  cong-<= Sec2.Z y p = ⋆
+  cong-<= (Sec2.S x) Sec2.Z p = cong-<= x Sec2.Z p
+  cong-<= (Sec2.S x) (Sec2.S y) p = cong-<= x (Sec2.S y) p
+
+  lem1 : (i : Sec2.ℕ) → (i >= Sec2.Z)
+  lem1 Sec2.Z = ⋆
+  lem1 (Sec2.S i) = lem1 i
+
+  lem2 : (i : Sec2.ℕ) → (i <= Sec2.Z)
+  lem2 Sec2.Z = ⋆
+  lem2 (Sec2.S i₁) = lem2 i₁
+
+  lem : {A : Set} →  (l : List A) → (i : Sec2.ℕ) → (i <= (length l))
+  lem [] Sec2.Z = ⋆
+  lem [] (Sec2.S i) = lem2 i
+  lem (x₁ ∷ l₁) i = cong-<= i (length l₁) (lem l₁ i)
+
+
 -- append two lists
 _++_ : {A : Set} → (l : List A) → (l' : List A) → (List A)
 [] ++ l' = l'
