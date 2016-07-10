@@ -110,11 +110,12 @@ exx1 = index (1 ∷ []) ⋆ 0 Sec2.ok
 
 index'' : {A : Set} → ∀ (l : List A)
                   → ∀ (i : Sec2.ℕ)
-                  → (nelist l)
-                  → Sec2.So ((i Sec2.≥ Sec2.Z) Sec2.& (i Sec2.< (length l)))
+                  → Sec2.So (i Sec2.< (length l))
                   → A
-index'' [] i () x
-index'' (x ∷ l) i ⋆ x₁ = {!!}
+index'' [] Sec2.Z ()
+index'' [] (Sec2.S i) ()
+index'' (x ∷ l) Sec2.Z Sec2.ok = x
+index'' (x ∷ l) (Sec2.S i) p = index'' l i p
 
 -- append two lists
 _++_ : {A : Set} → (l : List A) → (l' : List A) → (List A)
@@ -143,4 +144,14 @@ thm2-map : {A B C : Set} → (f : A → B) → (g : B → C) → (l : List A) �
 thm2-map f₁ g₁ [] = Sec2.refl
 thm2-map f₁ g₁ (x ∷ l) with (thm2-map f₁ g₁ l)
 thm2-map f₁ g₁ (x ∷ l) | p = cong (g₁ (f₁ x)) (map (λ z → g₁ (f₁ z)) l) (map g₁ (map f₁ l)) p
+
+-- Non empty list by construction 
+data NeList (A : Set) : Set where
+  ^_^ : A → NeList A
+  _∶_ : A → NeList A → NeList A
+
+infixr 60 ^_^
+infixr 60 _∶_
+
+
 
