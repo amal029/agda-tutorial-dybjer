@@ -40,16 +40,10 @@ Z ⋆ y = y
 
 -- Theorem that ≃₁ is a partial equivalence relation
 ≃₁-symmetric : {A : Set} → {f g : A → A} → (f ≃₁ g) → (g ≃₁ f)
-≃₁-symmetric (f≃g x) = f≃g (λ x₁ y x₂ → a≃b {!!})     -- todo
--- Goal: .g x₁ ≡ .f y
--- ————————————————————————————————————————————————————————————
--- x₂ : x₁ ≃₀ y
--- y  : .A
--- x₁ : .A
--- x  : (x₃ y₁ : .A) → x₃ ≃₀ y₁ → .f x₃ ≃₀ .g y₁
--- .g : .A → .A
--- .f : .A → .A
--- .A : Set
+≃₁-symmetric {A} {f} {g} (f≃g x) = f≃g (λ x₁ y x₂ → a≃b (prove x₁ y x₂ (f≃g x)))
+  where
+    prove : (z y : A) → (p : z ≃₀ y) → (f ≃₁ g) → (g z ≡ f y) 
+    prove z .z (a≃b refl) (f≃g x) = {!!}
 
 ≃₁-transitive : {A : Set} → {f g h : A → A}
                 → (f ≃₁ g) → (g ≃₁ h) → (f ≃₁ h)
