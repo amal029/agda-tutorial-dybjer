@@ -1,7 +1,8 @@
-module Universe where
+module MUniverse where
 
 -- This is universe polymorphism and extensional equality module
 open import Sec2
+-- import Data.List
 
 data _≃₀_ {A : Set} (a : A) (b : A) : Set where
   a≃b : (a ≡ b) → a ≃₀ b

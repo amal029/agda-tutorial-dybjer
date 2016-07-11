@@ -1,6 +1,6 @@
 module HWequivalence where
-open import Sec4
 
+open import Relation.Binary.PropositionalEquality
 data Bool : Set where
   T : Bool
   F : Bool
@@ -52,12 +52,6 @@ bit-adder-imp A B C = X & Y
       || ((! u) & C)
   Y : Bool
   Y = w || v
-
-infix 4 _≡_
-data _≡_ {a} {A : Set a} (x : A) : A → Set a where
-  refl : x ≡ x
-{-# BUILTIN EQUALITY _≡_  #-}
-{-# BUILTIN REFL     refl #-}
 
 data _≃_ {A : Set} (f : A → A) (g : A → A) : Set where
   f≃g : ((x y : A) → (x ≡ y) → (f x ≡ g y)) → f ≃ g
