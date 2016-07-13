@@ -111,9 +111,6 @@ t (APlus a a₁) .(aeval a + aeval a₁) refl = APlusR (aeval a) (aeval a₁) a 
 t (AMult a a₁) .(aeval a * aeval a₁) refl = AMultR (aeval a) (aeval a₁) a a₁ (t a (aeval a) refl)
                                             (t a₁ (aeval a₁) refl)
 
-pr1 : ∀ (a b : aexp) → ∀ (n1 n2 : ℕ) → (p1 : a ⇓ n1) → (p2 : b ⇓ n2) → ANum (aeval a + aeval b) ⇓ (n1 + n2)
-pr1 a b n1 n2 p1 p2 = {!!}
-
 tt : (a : aexp) → (n : ℕ) → (a ⇓ n) → (aeval a ≡ n)
 tt (ANum n₁) .n₁ (ANumR .n₁) = refl
 tt (APlus a a₁) .(n₁ + n₂) (APlusR n₁ n₂ .a .a₁ p p₁) with tt a n₁ p | tt a₁ n₂ p₁
