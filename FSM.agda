@@ -102,6 +102,10 @@ y .8 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))
 y .9 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))))) = S1 (suc (suc (suc (suc (suc (suc (suc (suc (suc zero)))))))))
                                                                          (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))))))
   
+y1 : ∀ (n : ℕ) → (p : n ≥ 10) → (A n) ↓ (D n)
+y1 n p = S2 n p
+
+
 -- Example of arithexpr as a relation
 data aexp : Set where
   ANum : ∀ (n : ℕ) → aexp
