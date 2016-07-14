@@ -26,12 +26,12 @@ step : (Loc Π Values) → (Loc Π Values)
 step < A , b > =
   if (X >= 10)
   then
-    < DONE , record { x = X; δ = Values.δ b ; k = Values.k b + 1 } >
+    < DONE , record { x = X; δ = Values.δ b ; k = Values.k b Data.Nat.+ 1 } >
   else
-    < A , record { x = X; δ = Values.δ b ; k = Values.k b + 1 } >
+    < A , record { x = X; δ = Values.δ b ; k = Values.k b Data.Nat.+ 1 } >
  where
  funₓ : ℕ → ℕ → ℕ → ℕ           -- slope = 1 here!
- funₓ x k δ = x + δ * k
+ funₓ x k δ = x Data.Nat.+ δ Data.Nat.* k
 
  _>=_ : ℕ → ℕ → Bool
  zero >= zero = true
@@ -73,7 +73,7 @@ data State : Set where
   D : ∀ (n : ℕ) → State
 
 private funₓ : ℕ → ℕ → ℕ → ℕ
-        funₓ x δ slope = x + δ * slope
+        funₓ x δ slope = x Data.Nat.+ δ Data.Nat.* slope
 
 data _↓_ : State → State → Prop where
   S1 : ∀ (n : ℕ) → (n < 10) → (A n) ↓ (A (funₓ n 1 1))
@@ -85,7 +85,7 @@ data fState : State → Prop where
 data oState : State → Prop where
   O : oState (A 0)
 
-y : ∀ (n : ℕ) → (p : n < 10) → (A n) ↓ (A (suc n))
+y : ∀ (n : ℕ) → (p : n < 10) → (A n) ↓ (A (ℕ.suc n))
 y .0 (s≤s z≤n) = S1 zero (s≤s z≤n)
 y .1 (s≤s (s≤s z≤n)) = S1 (suc zero) (s≤s (s≤s z≤n))
 y .2 (s≤s (s≤s (s≤s z≤n))) = S1 (suc (suc zero)) (s≤s (s≤s (s≤s z≤n)))
