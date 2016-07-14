@@ -67,7 +67,43 @@ invariant < DONE , record { x = x ; δ = δ ; k = k } > =  x ≥ 10
 thm : invariant (runFSM 5 (< A , (record { x = zero ; δ = 1 ; k = zero }) >))
 thm = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))))
 
+-- Example of state machine as a relation
+data State : Set where
+  A : ∀ (n : ℕ) → State
+  D : ∀ (n : ℕ) → State
 
+private funₓ : ℕ → ℕ → ℕ → ℕ
+        funₓ x δ slope = x + δ * slope
+
+data _↓_ : State → State → Prop where
+  S1 : ∀ (n : ℕ) → (n < 10) → (A n) ↓ (A (funₓ n 1 1))
+  S2 : ∀ (n : ℕ) → (n ≥ 10) → (A n) ↓ (D n)
+
+data fState : State → Prop where
+  F : ∀ (n : ℕ) →  (n ≥ 10) →  fState (D n)
+
+data oState : State → Prop where
+  O : oState (A 0)
+
+c1 : ∀ (n : ℕ) → (p : (suc n) ≤ 9) → (n ≤ 9)
+c1 .0 (s≤s z≤n) = z≤n
+c1 .1 (s≤s (s≤s z≤n)) = s≤s z≤n
+c1 .2 (s≤s (s≤s (s≤s z≤n))) = s≤s (s≤s z≤n)
+c1 .3 (s≤s (s≤s (s≤s (s≤s z≤n)))) = s≤s (s≤s (s≤s z≤n))
+c1 .4 (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))) = s≤s (s≤s (s≤s (s≤s z≤n)))
+c1 .5 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))) = s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))
+c1 .6 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))) = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))
+c1 .7 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))) = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))
+c1 .8 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))))) = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))
+
+y : ∀ (n : ℕ) → (p : n < 10) → (A n) ↓ (A (suc n))
+y zero (s≤s p) = S1 zero (s≤s p)
+y (suc n) (s≤s p) with (y n (s≤s (c1 n p)))
+y (suc n) (s≤s p) | h = c n h
+  where
+  c : ∀ (a : ℕ) →  (h : (A a) ↓ (A (suc a))) → (A (suc a) ↓ (A (suc (suc a))))
+  c a h = {!!} 
+  
 -- Example of arithexpr as a relation
 data aexp : Set where
   ANum : ∀ (n : ℕ) → aexp
@@ -104,14 +140,14 @@ th = APlusR
        (ANumR
         (suc (suc (suc (suc (suc (suc (suc (suc (suc (suc zero)))))))))))
 
-t : (a : aexp) → ∀ (p : ℕ) → (aeval a ≡ p) → (a ⇓ p)
+t : ∀ (a : aexp) (p : ℕ) → (aeval a ≡ p) → (a ⇓ p)
 t (ANum n) .n refl = ANumR n
 t (APlus a a₁) .(aeval a + aeval a₁) refl = APlusR (aeval a) (aeval a₁) a a₁ (t a (aeval a) refl)
                                             (t a₁ (aeval a₁) refl)
 t (AMult a a₁) .(aeval a * aeval a₁) refl = AMultR (aeval a) (aeval a₁) a a₁ (t a (aeval a) refl)
                                             (t a₁ (aeval a₁) refl)
 
-tt : (a : aexp) → (n : ℕ) → (a ⇓ n) → (aeval a ≡ n)
+tt : ∀ (a : aexp) (n : ℕ) → (a ⇓ n) → (aeval a ≡ n)
 tt (ANum n₁) .n₁ (ANumR .n₁) = refl
 tt (APlus a a₁) .(n₁ + n₂) (APlusR n₁ n₂ .a .a₁ p p₁) with tt a n₁ p | tt a₁ n₂ p₁
 tt (APlus a a₁) .(aeval a + aeval a₁) (APlusR .(aeval a) .(aeval a₁) .a .a₁ p p₁) | refl | refl = refl
