@@ -85,24 +85,22 @@ data fState : State → Prop where
 data oState : State → Prop where
   O : oState (A 0)
 
-c1 : ∀ (n : ℕ) → (p : (suc n) ≤ 9) → (n ≤ 9)
-c1 .0 (s≤s z≤n) = z≤n
-c1 .1 (s≤s (s≤s z≤n)) = s≤s z≤n
-c1 .2 (s≤s (s≤s (s≤s z≤n))) = s≤s (s≤s z≤n)
-c1 .3 (s≤s (s≤s (s≤s (s≤s z≤n)))) = s≤s (s≤s (s≤s z≤n))
-c1 .4 (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))) = s≤s (s≤s (s≤s (s≤s z≤n)))
-c1 .5 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))) = s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))
-c1 .6 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))) = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))
-c1 .7 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))) = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))
-c1 .8 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))))) = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))
-
 y : ∀ (n : ℕ) → (p : n < 10) → (A n) ↓ (A (suc n))
-y zero (s≤s p) = S1 zero (s≤s p)
-y (suc n) (s≤s p) with (y n (s≤s (c1 n p)))
-y (suc n) (s≤s p) | h = c n h
-  where
-  c : ∀ (a : ℕ) →  (h : (A a) ↓ (A (suc a))) → (A (suc a) ↓ (A (suc (suc a))))
-  c a h = {!!} 
+y .0 (s≤s z≤n) = S1 zero (s≤s z≤n)
+y .1 (s≤s (s≤s z≤n)) = S1 (suc zero) (s≤s (s≤s z≤n))
+y .2 (s≤s (s≤s (s≤s z≤n))) = S1 (suc (suc zero)) (s≤s (s≤s (s≤s z≤n)))
+y .3 (s≤s (s≤s (s≤s (s≤s z≤n)))) = S1 (suc (suc (suc zero))) (s≤s (s≤s (s≤s (s≤s z≤n))))
+y .4 (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))) = S1 (suc (suc (suc (suc zero)))) (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))
+y .5 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))) = S1 (suc (suc (suc (suc (suc zero)))))
+                                                 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))
+y .6 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))) = S1 (suc (suc (suc (suc (suc (suc zero))))))
+                                                       (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))
+y .7 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))) = S1 (suc (suc (suc (suc (suc (suc (suc zero)))))))
+                                                             (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))))
+y .8 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))))) = S1 (suc (suc (suc (suc (suc (suc (suc (suc zero))))))))
+                                                                   (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))))
+y .9 (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n)))))))))) = S1 (suc (suc (suc (suc (suc (suc (suc (suc (suc zero)))))))))
+                                                                         (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))))))))
   
 -- Example of arithexpr as a relation
 data aexp : Set where
