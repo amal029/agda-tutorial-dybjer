@@ -118,6 +118,47 @@ aeval (ANum n) = n
 aeval (APlus a₁ a₂) = (aeval a₁) + (aeval a₂)
 aeval (AMult n₁ n₂) = (aeval n₁) * (aeval n₂)
 
+_==_ : ℕ → ℕ → Bool
+zero == zero = true
+zero == suc y = false
+suc x == zero = false
+suc x == suc y = x == y
+
+-- compiler optimization
+aexp-opt1 : aexp → aexp
+aexp-opt1 (ANum n) = ANum n
+aexp-opt1 (APlus (ANum n) (ANum n₁)) with (n == 0) Data.Bool.∧ (n₁ == n)
+aexp-opt1 (APlus (ANum n) (ANum n₁)) | false = (APlus (ANum n) (ANum n₁))
+aexp-opt1 (APlus (ANum n) (ANum n₁)) | true = (ANum 0)
+aexp-opt1 (APlus x x₁) = APlus x x₁
+aexp-opt1 (AMult (ANum n) (ANum n₁)) with (n == 0) Data.Bool.∨ (n₁ == 0)
+aexp-opt1 (AMult (ANum n) (ANum n₁)) | true = ANum 0
+aexp-opt1 (AMult (ANum n) (ANum n₁)) | false = (AMult (ANum n) (ANum n₁))
+aexp-opt1 (AMult x x₁) = (AMult x x₁)
+
+-- Theorem that the optimization is correct!
+thm-opt1 : ∀ (a : aexp) → ∀ (n : ℕ)
+           → (aeval a ≡ n)
+           → aeval (aexp-opt1 a) ≡ n
+thm-opt1 (ANum n) .n refl = refl
+thm-opt1 (APlus (ANum zero) (ANum zero)) .0 refl = refl
+thm-opt1 (APlus (ANum zero) (ANum (suc n))) .(suc n) refl = refl
+thm-opt1 (APlus (ANum (suc n)) (ANum n₁)) .(suc (n + n₁)) refl = refl
+thm-opt1 (APlus (ANum n) (APlus b b₁)) .(n + (aeval b + aeval b₁)) refl = refl
+thm-opt1 (APlus (ANum n) (AMult b b₁)) .(n + aeval b * aeval b₁) refl = refl
+thm-opt1 (APlus (APlus a a₁) b) .(aeval a + aeval a₁ + aeval b) refl = refl
+thm-opt1 (APlus (AMult a a₁) b) .(aeval a * aeval a₁ + aeval b) refl = refl
+thm-opt1 (AMult (ANum zero) (ANum n₁)) .0 refl = refl
+thm-opt1 (AMult (ANum (suc n)) (ANum zero)) .(n * 0) refl = cc n
+  where
+  cc : ∀ (n : ℕ) → (0 ≡ n * 0)
+  cc zero = refl
+  cc (suc n) = cc n
+thm-opt1 (AMult (ANum (suc n)) (ANum (suc p))) .(suc (p + n * suc p)) refl = refl
+thm-opt1 (AMult (ANum n) (APlus b b₁)) .(n * (aeval b + aeval b₁)) refl = refl
+thm-opt1 (AMult (ANum n) (AMult b b₁)) .(n * (aeval b * aeval b₁)) refl = refl
+thm-opt1 (AMult (APlus a a₁) b) .((aeval a + aeval a₁) * aeval b) refl = refl
+thm-opt1 (AMult (AMult a a₁) b) .(aeval a * aeval a₁ * aeval b) refl = refl
 
 -- Now as a relation
 data _⇓_ : aexp → ℕ → Prop where
