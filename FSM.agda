@@ -58,7 +58,6 @@ theorem : runFSM 10 (< A , (record { x = zero ; δ = 1 ; k = zero }) >) ≡ < DO
                            record { x = 10 ; δ = 1 ; k = 5 } >
 theorem  = refl
 
-
 -- invariant when in DONE state, X ≥ 10
 invariant : (Loc Π Values) → Prop
 invariant < A , record { x = x ; δ = δ ; k = k } > = ⊥
