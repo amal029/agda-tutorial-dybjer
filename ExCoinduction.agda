@@ -55,9 +55,18 @@ step < A , b > | true = < DONE , record { x = X; δ = Values.δ b ; k = Values.k
 step < DONE , b > = < DONE , b > -- Just remain in this state forever
 
 -- Make a stream of runFSM
-from : (st : (Loc Π Values)) → Stream (Loc Π Values)
-from st = st ∷ (♯ from (step st))
+-- 
+f' : ∀ st → Stream (Loc Π Values)
+f' st = st ∷ ♯ (f' (step st))
+from : Stream (Loc Π Values)
+from =  f' (< A , (record { x = zero ; δ = 1 ; k = zero }) >)
 
--- Trivial proof.
-thm : ∀ (st : (Loc Π Values)) →  from st ≈ from st
-thm st = refl ∷ ♯ thm (step st)
+thm : from ≈ from 
+thm = refl ∷ ♯ (refl ∷ (♯ (refl ∷ (♯ (refl ∷ (♯ (refl ∷ (♯ (refl ∷ (♯ (refl ∷ (♯ (refl ∷ (♯ (refl ∷
+             (♯ (refl ∷ ♯ (t'))))))))))))))))))
+
+    where
+    y : Stream (Loc Π Values)
+    y = f' (< DONE , record { x = 10 ; δ = 1 ; k = 10 } > ) 
+    t' : y ≈ y
+    t' = refl ∷ (♯ t')
