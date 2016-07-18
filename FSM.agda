@@ -169,34 +169,54 @@ data _⇓_ : aexp → ℕ → Prop where
            → (a₁ ⇓ n₁) → (a₂ ⇓ n₂)
            → (AMult a₁ a₂) ⇓ (n₁ * n₂)
 
+∧-Zero : ∀ (x y : ℕ) → ((x ≡ 0) Sec4.∧ (y ≡ 0)) Sec4.∨ ⊤
+∧-Zero zero zero = ora (and refl refl)
+∧-Zero zero (suc y) = orb ⋆
+∧-Zero (suc x) y = orb ⋆
+
+∨-Zero : ∀ (x y : ℕ) → ((x ≡ 0) Sec4.∨ (y ≡ 0)) Sec4.∨ ⊤
+∨-Zero zero _ = ora (ora refl)
+∨-Zero (suc x) zero = ora (orb refl)
+∨-Zero (suc x) (suc y) = orb ⋆
+
+-- compiler optimization
+aexp-opt2 : aexp → aexp
+aexp-opt2 (ANum n) = ANum n
+aexp-opt2 (APlus (ANum n) (ANum n₁)) with ∧-Zero n n₁
+aexp-opt2 (APlus (ANum .0) (ANum .0)) | ora (and refl refl) = ANum zero
+aexp-opt2 (APlus (ANum n) (ANum n₁)) | orb _ = (APlus (ANum n) (ANum n₁))
+aexp-opt2 (APlus x x₁) = APlus x x₁
+aexp-opt2 (AMult (ANum n) (ANum n₁)) with ∨-Zero n n₁
+aexp-opt2 (AMult (ANum .0) (ANum n₁)) | ora (ora refl) = ANum 0
+aexp-opt2 (AMult (ANum n) (ANum .0)) | ora (orb refl) = ANum 0
+aexp-opt2 (AMult (ANum n) (ANum n₁)) | orb x = (AMult (ANum n) (ANum n₁))
+aexp-opt2 (AMult x x₁) = (AMult x x₁)
+
+
+yy : ∀ (n : ℕ) → (n * 0) ≡ 0
+yy zero = refl
+yy (suc n) = yy n
+
 -- Theorem that the optimization is correct in relations
-thm-rel-opt1 : ∀ (a : aexp) → ∀ (p : ℕ) → (a ⇓ p) → ((aexp-opt1 a) ⇓ p)
-thm-rel-opt1 (ANum n) zero e = e
-thm-rel-opt1 (APlus (ANum n) (ANum n₁)) pp e with (n == 0) Data.Bool.∧ (n₁ == n)
-thm-rel-opt1 (APlus (ANum n) (ANum n₁)) pp e | false = e
-thm-rel-opt1 (APlus (ANum n) (ANum n₁)) zero e | true = ANumR zero
-thm-rel-opt1 (APlus (ANum n) (ANum n₁)) (suc pp) e | true = {!!} -- I think you need ≡ and 
-thm-rel-opt1 (APlus (ANum n) (APlus b b₁)) zero e = e
-thm-rel-opt1 (APlus (ANum n) (AMult b b₁)) zero e = e
-thm-rel-opt1 (APlus (APlus a a₁) b) zero e = e
-thm-rel-opt1 (APlus (AMult a a₁) b) zero e = e
-thm-rel-opt1 (AMult (ANum n) (ANum n₁)) p e with (n == 0) Data.Bool.∨ (n₁ == 0)
-thm-rel-opt1 (AMult (ANum n) (ANum n₁)) p e | false = e
-thm-rel-opt1 (AMult (ANum n) (ANum n₁)) zero e | true = ANumR zero
-thm-rel-opt1 (AMult (ANum n) (ANum n₁)) (suc p) e | true = {!!} -- Need ≡ equality on zero
-thm-rel-opt1 (AMult (ANum n) (APlus b b₁)) zero e = e
-thm-rel-opt1 (AMult (ANum n) (AMult b b₁)) zero e = e
-thm-rel-opt1 (AMult (APlus a a₁) b) zero e = e
-thm-rel-opt1 (AMult (AMult a a₁) b) zero e = e
-thm-rel-opt1 (ANum n) (suc p) e = e
-thm-rel-opt1 (APlus (ANum n) (APlus b b₁)) (suc p) e = e
-thm-rel-opt1 (APlus (ANum n) (AMult b b₁)) (suc p) e = e
-thm-rel-opt1 (APlus (APlus a a₁) b) (suc p) e = e
-thm-rel-opt1 (APlus (AMult a a₁) b) (suc p) e = e
-thm-rel-opt1 (AMult (ANum n) (APlus b b₁)) (suc p) e = e
-thm-rel-opt1 (AMult (ANum n) (AMult b b₁)) (suc p) e = e
-thm-rel-opt1 (AMult (APlus a a₁) b) (suc p) e = e
-thm-rel-opt1 (AMult (AMult a a₁) b) (suc p) e = e
+thm-rel-opt2 : ∀ (a : aexp) → ∀ (p : ℕ) → (a ⇓ p) → ((aexp-opt2 a) ⇓ p)
+thm-rel-opt2 (ANum n) p e = e
+thm-rel-opt2 (APlus (ANum n) (ANum n₁)) p e with ∧-Zero n n₁
+thm-rel-opt2 (APlus (ANum .0) (ANum .0)) .0 (APlusR .0 .0 .(ANum 0) .(ANum 0) (ANumR .0) (ANumR .0)) | ora (and refl refl) = ANumR zero
+thm-rel-opt2 (APlus (ANum n) (ANum n₁)) p e | orb x = e
+thm-rel-opt2 (APlus (ANum n) (APlus a a₁)) p e = e
+thm-rel-opt2 (APlus (ANum n) (AMult a a₁)) p e = e
+thm-rel-opt2 (APlus (APlus a a₁) a₂) p e = e
+thm-rel-opt2 (APlus (AMult a a₁) a₂) p e = e
+thm-rel-opt2 (AMult (ANum n) (ANum n₁)) p e with ∨-Zero n n₁
+thm-rel-opt2 (AMult (ANum .0) (ANum n₃)) .0 (AMultR .0 .n₃ .(ANum 0) .(ANum n₃) (ANumR .0) (ANumR .n₃)) | ora (ora refl) = ANumR zero
+thm-rel-opt2 (AMult (ANum n₁) (ANum .0)) .(n₁ * 0) (AMultR .n₁ .0 .(ANum n₁) .(ANum 0) (ANumR .n₁) (ANumR .0)) | ora (orb refl) with (yy n₁)
+thm-rel-opt2 (AMult (ANum n₁) (ANum .0)) .(n₁ * 0) (AMultR .n₁ .0 .(ANum n₁) .(ANum 0) (ANumR .n₁) (ANumR .0)) | ora (orb refl) | j with n₁ * 0
+thm-rel-opt2 (AMult (ANum n₁) (ANum _)) .(n₁ * _) (AMultR .n₁ _ .(ANum n₁) .(ANum _) (ANumR .n₁) (ANumR _)) | ora (orb refl) | refl | .0 = ANumR zero
+thm-rel-opt2 (AMult (ANum n) (ANum n₁)) p e | orb x = e
+thm-rel-opt2 (AMult (ANum n) (APlus b b₁)) p e = e
+thm-rel-opt2 (AMult (ANum n) (AMult b b₁)) p e = e
+thm-rel-opt2 (AMult (APlus a a₁) b) p e = e
+thm-rel-opt2 (AMult (AMult a a₁) b) p e = e
 
 th : (APlus (ANum 10) (ANum 10)) ⇓ 20
 th = APlusR
