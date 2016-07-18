@@ -169,6 +169,35 @@ data _⇓_ : aexp → ℕ → Prop where
            → (a₁ ⇓ n₁) → (a₂ ⇓ n₂)
            → (AMult a₁ a₂) ⇓ (n₁ * n₂)
 
+-- Theorem that the optimization is correct in relations
+thm-rel-opt1 : ∀ (a : aexp) → ∀ (p : ℕ) → (a ⇓ p) → ((aexp-opt1 a) ⇓ p)
+thm-rel-opt1 (ANum n) zero e = e
+thm-rel-opt1 (APlus (ANum n) (ANum n₁)) pp e with (n == 0) Data.Bool.∧ (n₁ == n)
+thm-rel-opt1 (APlus (ANum n) (ANum n₁)) pp e | false = e
+thm-rel-opt1 (APlus (ANum n) (ANum n₁)) zero e | true = ANumR zero
+thm-rel-opt1 (APlus (ANum n) (ANum n₁)) (suc pp) e | true = {!!} -- I think you need ≡ and 
+thm-rel-opt1 (APlus (ANum n) (APlus b b₁)) zero e = e
+thm-rel-opt1 (APlus (ANum n) (AMult b b₁)) zero e = e
+thm-rel-opt1 (APlus (APlus a a₁) b) zero e = e
+thm-rel-opt1 (APlus (AMult a a₁) b) zero e = e
+thm-rel-opt1 (AMult (ANum n) (ANum n₁)) p e with (n == 0) Data.Bool.∨ (n₁ == 0)
+thm-rel-opt1 (AMult (ANum n) (ANum n₁)) p e | false = e
+thm-rel-opt1 (AMult (ANum n) (ANum n₁)) zero e | true = ANumR zero
+thm-rel-opt1 (AMult (ANum n) (ANum n₁)) (suc p) e | true = {!!} -- Need ≡ equality on zero
+thm-rel-opt1 (AMult (ANum n) (APlus b b₁)) zero e = e
+thm-rel-opt1 (AMult (ANum n) (AMult b b₁)) zero e = e
+thm-rel-opt1 (AMult (APlus a a₁) b) zero e = e
+thm-rel-opt1 (AMult (AMult a a₁) b) zero e = e
+thm-rel-opt1 (ANum n) (suc p) e = e
+thm-rel-opt1 (APlus (ANum n) (APlus b b₁)) (suc p) e = e
+thm-rel-opt1 (APlus (ANum n) (AMult b b₁)) (suc p) e = e
+thm-rel-opt1 (APlus (APlus a a₁) b) (suc p) e = e
+thm-rel-opt1 (APlus (AMult a a₁) b) (suc p) e = e
+thm-rel-opt1 (AMult (ANum n) (APlus b b₁)) (suc p) e = e
+thm-rel-opt1 (AMult (ANum n) (AMult b b₁)) (suc p) e = e
+thm-rel-opt1 (AMult (APlus a a₁) b) (suc p) e = e
+thm-rel-opt1 (AMult (AMult a a₁) b) (suc p) e = e
+
 th : (APlus (ANum 10) (ANum 10)) ⇓ 20
 th = APlusR
        (suc (suc (suc (suc (suc (suc (suc (suc (suc (suc zero))))))))))
