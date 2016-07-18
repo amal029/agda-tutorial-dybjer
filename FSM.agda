@@ -209,6 +209,7 @@ thm-rel-opt2 (APlus (APlus a a₁) a₂) p e = e
 thm-rel-opt2 (APlus (AMult a a₁) a₂) p e = e
 thm-rel-opt2 (AMult (ANum n) (ANum n₁)) p e with ∨-Zero n n₁
 thm-rel-opt2 (AMult (ANum .0) (ANum n₃)) .0 (AMultR .0 .n₃ .(ANum 0) .(ANum n₃) (ANumR .0) (ANumR .n₃)) | ora (ora refl) = ANumR zero
+-- The below is rewrite 
 thm-rel-opt2 (AMult (ANum n₁) (ANum .0)) .(n₁ * 0) (AMultR .n₁ .0 .(ANum n₁) .(ANum 0) (ANumR .n₁) (ANumR .0)) | ora (orb refl) with (yy n₁)
 thm-rel-opt2 (AMult (ANum n₁) (ANum .0)) .(n₁ * 0) (AMultR .n₁ .0 .(ANum n₁) .(ANum 0) (ANumR .n₁) (ANumR .0)) | ora (orb refl) | j with n₁ * 0
 thm-rel-opt2 (AMult (ANum n₁) (ANum _)) .(n₁ * _) (AMultR .n₁ _ .(ANum n₁) .(ANum _) (ANumR .n₁) (ANumR _)) | ora (orb refl) | refl | .0 = ANumR zero
