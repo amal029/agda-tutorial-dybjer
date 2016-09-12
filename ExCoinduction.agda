@@ -1,6 +1,4 @@
 module ExCoinduction where
-
-
 open import Coinduction
 open import Relation.Binary.PropositionalEquality
 open import Data.Stream
