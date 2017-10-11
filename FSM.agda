@@ -160,7 +160,7 @@ thm-opt1 (AMult (APlus a a₁) b) .((aeval a + aeval a₁) * aeval b) refl = ref
 thm-opt1 (AMult (AMult a a₁) b) .(aeval a * aeval a₁ * aeval b) refl = refl
 
 -- Now as a relation
-data _⇓_ : aexp → ℕ → Prop where
+data _⇓_ : aexp → ℕ → Set where
   ANumR : ∀ (n : ℕ) → ANum n ⇓ n
   APlusR : ∀ (n₁ n₂ : ℕ) → ∀ (a₁ a₂ : aexp)
            → (a₁ ⇓ n₁) → (a₂ ⇓ n₂)

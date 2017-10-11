@@ -28,7 +28,7 @@ data ℕ : Set where
   Z : ℕ
   S : ℕ → ℕ
 
-_+_ : ℕ → ℕ → ℕ
+_+_ : ∀ (m : ℕ) → ∀ (n : ℕ) → ℕ
 Z + m = m
 (S n) + m = S (n + m)
 
@@ -172,7 +172,7 @@ data _≡_ {a} {A : Set a} (x : A) : A → Set a where
 
 -- XXX: Transitivity of ℕ
 ℕ-trans : ∀ {x y z : ℕ} → (x ≡ y) → (y ≡ z) → (x ≡ z)
-ℕ-trans refl p2 = p2
+ℕ-trans refl refl = refl
 
 -- XXX: Symmetry of ℕ 
 sym : ∀ {x y : ℕ} → (x ≡ y) → (y ≡ x)
@@ -284,3 +284,21 @@ thm : ∀ (x : ℕ) → (fact x) >⋆ Z
 thm Z = ⋆
 thm (S Z) = ⋆
 thm (S (S x)) = lem (x * fact (S x)) (fact (S x)) (thm (S x))
+
+_<=_ : ∀ (m n : ℕ) → Prop
+Z <= n = ⊤
+S m <= Z = ⊥
+S m <= S n = m <= n
+
+-- symm : ∀ (m n : ℕ) → (p : m <= n) → (n <= m)
+-- symm Z Z p = ⋆
+-- symm Z (S n) p = {!!}
+-- symm (S m) Z p = ⋆
+-- symm (S m) (S n) p = symm m n p
+
+transm : ∀ (m n p : ℕ) → (m <= n) → (n <= p) → (m <= p)
+transm Z n p p1 p2 = ⋆
+transm (S m) Z Z p1 p2 = p1
+transm (S m) (S n) Z p1 p2 = p2
+transm (S m) Z (S p) () p2 
+transm (S m) (S n) (S p) p1 p2 = transm m n p p1 p2

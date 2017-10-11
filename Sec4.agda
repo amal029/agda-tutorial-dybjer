@@ -130,6 +130,9 @@ associative  = eq
 elim-neg : {A : Prop} → A → (¬ A) → ⊥
 elim-neg y (neg x) = elim-⇒ x y
 
+eet : {A B : Prop} → ((¬ A) ∧ (¬ B)) ⇒ (¬ (A ∧ B))
+eet = impl (λ x → neg (impl (λ x₁ → elim-neg (elim1-∧ x₁) (elim1-∧ x))))
+
 
 -- tt : {A : Prop} → (A ∨ (¬ A)) → (¬ (¬ A)) → A
 -- tt (ora x) (neg y) = x
@@ -173,18 +176,18 @@ C-⇒ = impl (λ _ → ⋆)
 --                           -- difference between constructive logic, and
 --                           -- classical logic.
 
--- distributive : {p q r : prop} → (p ∧ (q ∨ r)) ⇔ ((p ∧ q) ∨ (p ∧ r))
+-- distributive : {p q r : Prop} → (p ∧ (q ∨ r)) ⇔ ((p ∧ q) ∨ (p ∧ r))
 -- distributive =
 --                eq
 --                (impl (λ x →
 --                         let p = elim1-∧ x
 --                             x2 = elim2-∧ x
---                             x3 = elim-∨ x2 (λ q → q) _ 
+--                             x3 = elim-∨ x2 (λ q → q) (λ x₁ → {!!})
 --                         in
 --                         ora (and p x3)))
 --                (impl (λ x →
 --                         let x1 = elim-∨ x (λ l → elim1-∧ l) (λ r → elim1-∧ r)
---                             x2 = elim-∨ x _ (λ r → elim2-∧ r)
+--                             x2 = elim-∨ x (λ x₁ → {!!}) (λ r → elim2-∧ r)
 --                         in
 --                         and x1 (orb x2)))
 
@@ -198,7 +201,7 @@ and-⇒ = impl (λ x → impl (λ x₁ → elim2-∧ x))
 -- XXX: Predicate logic
 -- XXX: For all introduction
 data ForAll (A : Set) (B : A → Prop) : Prop where
-  dfun : ((x : A) → (B x)) → (ForAll A B)
+  dfun : (∀ (x : A) → (B x)) → (ForAll A B)
 
 elim-ForAll : {A : Set} → (x : A) → {B : A → Prop} → (ForAll A B) → (B x)
 elim-ForAll x (dfun x₁) = x₁ x
