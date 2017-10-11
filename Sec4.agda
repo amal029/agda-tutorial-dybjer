@@ -194,6 +194,17 @@ C-⇒ = impl (λ _ → ⋆)
 and-⇒ : {A B : Prop} → (A ∧ B) ⇒ (A ⇒ B)
 and-⇒ = impl (λ x → impl (λ x₁ → elim2-∧ x))
 
+tii : {A B C : Prop} → ((A ∧ B) ⇒ C) ⇒ (A ⇒ (B ⇒ C))
+tii  = impl (λ x → impl (λ x₁ → impl (λ x₂ → elim-⇒ x (and x₁ x₂))))
+
+tii2 : {A B : Prop} → (((¬ A) ∨ B) ∧ A) ⇒ B
+tii2 = impl (λ x →
+            let
+              x₁ = elim1-∧ x
+              x₂ = elim2-∧ x
+            in
+            {!!})
+
 
 -- contradiction : {A : Prop} → (¬ (¬ A)) ⇒ A
 -- contradiction = impl (λ x → {!!})
