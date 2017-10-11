@@ -190,30 +190,72 @@ S m ≤ S n = m ≤ n
 
 -- ≠ 
 _≠_ : ∀ (m n : ℕ) → Prop
-Z ≠ Z =  ⊤
-Z ≠ S n = ⊥
-S m ≠ Z = ⊥
+Z ≠ Z = ⊥
+Z ≠ S n = ⊤
+S m ≠ Z = ⊤
 S m ≠ S n = m ≠ n
 
--- Is ≠ an equivalence relation?
+-- -- Is ≠ an equivalence relation?
 -- ≠-refl
-≠-relf : ∀ (m : ℕ) → (m ≠ m)
-≠-relf Z = ⋆
-≠-relf (S m) = ≠-relf m
+-- ≠-relf : ∀ (m : ℕ) → (m ≠ m)
+-- ≠-relf Z = {!!}
+-- ≠-relf (S m) = ≠-relf m
 
--- Symmetry
+-- -- Symmetry
 ≠-sym : ∀ (m n : ℕ) → (m ≠ n) → (n ≠ m)
-≠-sym Z Z p = ⋆
-≠-sym Z (S n) ()
-≠-sym (S m) Z ()
+≠-sym Z Z ()
+≠-sym Z (S n) p = ⋆
+≠-sym (S m) Z p = ⋆
 ≠-sym (S m) (S n) p = ≠-sym m n p
 
--- Transitivity
-≠-trans : ∀ (m n p : ℕ) → (m ≠ n) → (n ≠ p) → (m ≠ p)
-≠-trans Z n Z h0 h1 = ⋆
-≠-trans Z Z (S p) h0 h1 = h1
-≠-trans Z (S n) (S p) () h1
-≠-trans (S m) Z Z () h1
-≠-trans (S m) (S n) Z h0 ()
-≠-trans (S m) Z (S p) h0 ()
-≠-trans (S m) (S n) (S p) h0 h1 = ≠-trans m n p h0 h1
+-- -- Transitivity
+-- ≠-trans : ∀ (m n p : ℕ) → (m ≠ n) → (n ≠ p) → (m ≠ p)
+-- ≠-trans Z Z Z h0 ()
+-- ≠-trans Z (S n) Z ⋆ ⋆ = {!!}
+-- ≠-trans Z n (S p) h0 h1 = ⋆
+-- ≠-trans (S m) n Z h0 h1 = ⋆
+-- ≠-trans (S m) Z (S p) ⋆ ⋆ = {!!}
+-- ≠-trans (S m) (S n) (S p) h0 h1 = ≠-trans m n p h0 h1
+
+de1 : {A B : Prop} → ((¬ A) ∨ (¬ B)) ⇒ ¬ (A ∧ B)
+de1 = impl (λ x → neg (impl (λ x₁ →
+                               let y = elim1-∧ x₁
+                                   z = elim2-∧ x₁
+                               in
+                               elim-∨ x (λ x₃ → elim-neg y x₃) (λ x₂ → elim-neg z x₂))))
+
+
+de2 : {A B : Prop} → ((¬ A) ∧ (¬ B)) ⇒ (¬ (A ∨ B))
+de2 = impl (λ x → neg (impl (λ x₁ → elim-∨ x₁ (λ x₂ → elim-neg x₂ (elim1-∧ x))
+                                             (λ x₂ → elim-neg x₂ (elim2-∧ x)))))
+
+
+-- Multiplication of naturals
+_*_ : ∀ (m n : ℕ) → ℕ
+Z * n = Z
+S m * n = n + (m * n)
+
+-- Square relation on two naturals
+_r²_ : ∀ (m n : ℕ) → Prop
+m r² n = (m * m) ≡ (n * n)
+
+-- reflexivity of r²
+refl-r² : ∀ (m : ℕ) → (m r² m)
+refl-r² Z = refl
+refl-r² (S m) = refl
+
+sym-r² : ∀ (m n : ℕ) → (m r² n) → (n r² m)
+sym-r² Z Z p = refl
+sym-r² Z (S n) ()
+sym-r² (S m) Z ()
+sym-r² (S m) (S n) p rewrite p = refl
+
+trans-r² : ∀ (m n p : ℕ) → (m r² n) → (n r² p) → (m r² p)
+trans-r² Z n Z h0 h1 = refl
+trans-r² Z Z (S p) refl ()
+trans-r² Z (S n) (S p) () h1
+trans-r² (S m) Z Z () h1
+trans-r² (S m) (S n) Z h0 ()
+trans-r² (S m) Z (S p) () h1
+trans-r² (S m) (S n) (S p) h0 h1 rewrite h0 
+                                        | h1 = refl
