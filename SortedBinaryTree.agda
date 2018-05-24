@@ -67,5 +67,9 @@ module SortedBinaryTree where
             → Exists (SortedBinaryTree A) (λ t' → ordered t')
   insert' a t p = [ insert a t , insert-sorted a t p ]
 
+-- XXX: Write Proof that delete works.
+
+
+-- XXX: Write a version with record and setoid carrying the ≤, etc
 
 
