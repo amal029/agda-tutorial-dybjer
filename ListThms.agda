@@ -155,3 +155,5 @@ infixr 60 _∶_
 
 
 
+-- XXX: Prove these in Coq along with the other theorem from Mike Naha's
+-- tutorial in Agda.
