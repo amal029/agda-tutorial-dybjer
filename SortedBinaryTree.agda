@@ -49,7 +49,6 @@ module SortedBinaryTree where
   insert x (Node a t t₁) | ora x₁ = insert x t
   insert x (Node a t t₁) | orb x₁ = insert x t₁
 
-
 -- XXX: Prove that the tree obtained after insertion is sorted
   insert-sorted : (a : A)
                   → (t : SortedBinaryTree A)

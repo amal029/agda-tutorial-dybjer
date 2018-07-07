@@ -302,3 +302,7 @@ transm (S m) Z Z p1 p2 = p1
 transm (S m) (S n) Z p1 p2 = p2
 transm (S m) Z (S p) () p2 
 transm (S m) (S n) (S p) p1 p2 = transm m n p p1 p2
+
+-- Show that 2 + 3 ≡ 3 + 2
+eqq : 2 + 3 ≡ 3 + 2
+eqq = refl

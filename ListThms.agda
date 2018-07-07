@@ -127,7 +127,6 @@ _++_ : {A : Set} → (l : List A) → (l' : List A) → (List A)
 _∘_ : {A B C : Set} → (A → B) → (B → C) → (A → C)
 f ∘ g = λ x → (g (f x))
 
-
 cong : {A : Set} → (x : A) → (l m : List A) → (l Sec2.≡ m) → (x ∷ l) Sec2.≡ (x ∷ m)
 cong x l .l Sec2.refl = Sec2.refl
 
